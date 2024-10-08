@@ -1,0 +1,3 @@
+/home/maria/project1/CMakeFiles/rebuild_cache.dir
+/home/maria/project1/CMakeFiles/edit_cache.dir
+/home/maria/project1/CMakeFiles/project.dir
