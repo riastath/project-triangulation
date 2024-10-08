@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/maria/project1/includes/graphics
+CMAKE_SOURCE_DIR = /home/maria/project1
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/maria/project1/includes/graphics
+CMAKE_BINARY_DIR = /home/maria/project1
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,14 +80,14 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maria/project1/includes/graphics/CMakeFiles /home/maria/project1/includes/graphics/CMakeFiles/progress.marks
-	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maria/project1/includes/graphics/CMakeFiles 0
+	cd /home/maria/project1 && $(CMAKE_COMMAND) -E cmake_progress_start /home/maria/project1/CMakeFiles /home/maria/project1/includes/graphics/CMakeFiles/progress.marks
+	cd /home/maria/project1 && $(MAKE) -f CMakeFiles/Makefile2 includes/graphics/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/maria/project1/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	$(MAKE) -f CMakeFiles/Makefile2 clean
+	cd /home/maria/project1 && $(MAKE) -f CMakeFiles/Makefile2 includes/graphics/clean
 .PHONY : clean
 
 # The main clean target
@@ -97,30 +97,32 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	$(MAKE) -f CMakeFiles/Makefile2 preinstall
+	cd /home/maria/project1 && $(MAKE) -f CMakeFiles/Makefile2 includes/graphics/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	$(MAKE) -f CMakeFiles/Makefile2 preinstall
+	cd /home/maria/project1 && $(MAKE) -f CMakeFiles/Makefile2 includes/graphics/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/maria/project1 && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-#=============================================================================
-# Target rules for targets named graphics
+# Convenience name for target.
+includes/graphics/CMakeFiles/graphics.dir/rule:
+	cd /home/maria/project1 && $(MAKE) -f CMakeFiles/Makefile2 includes/graphics/CMakeFiles/graphics.dir/rule
+.PHONY : includes/graphics/CMakeFiles/graphics.dir/rule
 
-# Build rule for target.
-graphics: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 graphics
+# Convenience name for target.
+graphics: includes/graphics/CMakeFiles/graphics.dir/rule
+
 .PHONY : graphics
 
 # fast build rule for target.
 graphics/fast:
-	$(MAKE) -f CMakeFiles/graphics.dir/build.make CMakeFiles/graphics.dir/build
+	cd /home/maria/project1 && $(MAKE) -f includes/graphics/CMakeFiles/graphics.dir/build.make includes/graphics/CMakeFiles/graphics.dir/build
 .PHONY : graphics/fast
 
 graphics.o: graphics.cpp.o
@@ -129,7 +131,7 @@ graphics.o: graphics.cpp.o
 
 # target to build an object file
 graphics.cpp.o:
-	$(MAKE) -f CMakeFiles/graphics.dir/build.make CMakeFiles/graphics.dir/graphics.cpp.o
+	cd /home/maria/project1 && $(MAKE) -f includes/graphics/CMakeFiles/graphics.dir/build.make includes/graphics/CMakeFiles/graphics.dir/graphics.cpp.o
 .PHONY : graphics.cpp.o
 
 graphics.i: graphics.cpp.i
@@ -138,7 +140,7 @@ graphics.i: graphics.cpp.i
 
 # target to preprocess a source file
 graphics.cpp.i:
-	$(MAKE) -f CMakeFiles/graphics.dir/build.make CMakeFiles/graphics.dir/graphics.cpp.i
+	cd /home/maria/project1 && $(MAKE) -f includes/graphics/CMakeFiles/graphics.dir/build.make includes/graphics/CMakeFiles/graphics.dir/graphics.cpp.i
 .PHONY : graphics.cpp.i
 
 graphics.s: graphics.cpp.s
@@ -147,7 +149,7 @@ graphics.s: graphics.cpp.s
 
 # target to generate assembly for a file
 graphics.cpp.s:
-	$(MAKE) -f CMakeFiles/graphics.dir/build.make CMakeFiles/graphics.dir/graphics.cpp.s
+	cd /home/maria/project1 && $(MAKE) -f includes/graphics/CMakeFiles/graphics.dir/build.make includes/graphics/CMakeFiles/graphics.dir/graphics.cpp.s
 .PHONY : graphics.cpp.s
 
 # Help Target
@@ -173,6 +175,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/maria/project1 && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
