@@ -54,59 +54,18 @@ CMAKE_BINARY_DIR = /home/maria/project1
 
 # The main recursive "all" target.
 all: CMakeFiles/project.dir/all
-all: includes/utils/all
-all: includes/graphics/all
 
 .PHONY : all
 
 # The main recursive "preinstall" target.
-preinstall: includes/utils/preinstall
-preinstall: includes/graphics/preinstall
+preinstall:
 
 .PHONY : preinstall
 
 # The main recursive "clean" target.
 clean: CMakeFiles/project.dir/clean
-clean: includes/utils/clean
-clean: includes/graphics/clean
 
 .PHONY : clean
-
-#=============================================================================
-# Directory level rules for directory includes/graphics
-
-# Recursive "all" directory target.
-includes/graphics/all: includes/graphics/CMakeFiles/graphics.dir/all
-
-.PHONY : includes/graphics/all
-
-# Recursive "preinstall" directory target.
-includes/graphics/preinstall:
-
-.PHONY : includes/graphics/preinstall
-
-# Recursive "clean" directory target.
-includes/graphics/clean: includes/graphics/CMakeFiles/graphics.dir/clean
-
-.PHONY : includes/graphics/clean
-
-#=============================================================================
-# Directory level rules for directory includes/utils
-
-# Recursive "all" directory target.
-includes/utils/all: includes/utils/CMakeFiles/utils.dir/all
-
-.PHONY : includes/utils/all
-
-# Recursive "preinstall" directory target.
-includes/utils/preinstall:
-
-.PHONY : includes/utils/preinstall
-
-# Recursive "clean" directory target.
-includes/utils/clean: includes/utils/CMakeFiles/utils.dir/clean
-
-.PHONY : includes/utils/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/project.dir
@@ -115,7 +74,7 @@ includes/utils/clean: includes/utils/CMakeFiles/utils.dir/clean
 CMakeFiles/project.dir/all:
 	$(MAKE) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/depend
 	$(MAKE) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maria/project1/CMakeFiles --progress-num=3,4 "Built target project"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maria/project1/CMakeFiles --progress-num=1,2 "Built target project"
 .PHONY : CMakeFiles/project.dir/all
 
 # Build rule for subdir invocation for target.
@@ -134,60 +93,6 @@ project: CMakeFiles/project.dir/rule
 CMakeFiles/project.dir/clean:
 	$(MAKE) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/clean
 .PHONY : CMakeFiles/project.dir/clean
-
-#=============================================================================
-# Target rules for target includes/utils/CMakeFiles/utils.dir
-
-# All Build rule for target.
-includes/utils/CMakeFiles/utils.dir/all:
-	$(MAKE) -f includes/utils/CMakeFiles/utils.dir/build.make includes/utils/CMakeFiles/utils.dir/depend
-	$(MAKE) -f includes/utils/CMakeFiles/utils.dir/build.make includes/utils/CMakeFiles/utils.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maria/project1/CMakeFiles --progress-num=5,6 "Built target utils"
-.PHONY : includes/utils/CMakeFiles/utils.dir/all
-
-# Build rule for subdir invocation for target.
-includes/utils/CMakeFiles/utils.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maria/project1/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 includes/utils/CMakeFiles/utils.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maria/project1/CMakeFiles 0
-.PHONY : includes/utils/CMakeFiles/utils.dir/rule
-
-# Convenience name for target.
-utils: includes/utils/CMakeFiles/utils.dir/rule
-
-.PHONY : utils
-
-# clean rule for target.
-includes/utils/CMakeFiles/utils.dir/clean:
-	$(MAKE) -f includes/utils/CMakeFiles/utils.dir/build.make includes/utils/CMakeFiles/utils.dir/clean
-.PHONY : includes/utils/CMakeFiles/utils.dir/clean
-
-#=============================================================================
-# Target rules for target includes/graphics/CMakeFiles/graphics.dir
-
-# All Build rule for target.
-includes/graphics/CMakeFiles/graphics.dir/all:
-	$(MAKE) -f includes/graphics/CMakeFiles/graphics.dir/build.make includes/graphics/CMakeFiles/graphics.dir/depend
-	$(MAKE) -f includes/graphics/CMakeFiles/graphics.dir/build.make includes/graphics/CMakeFiles/graphics.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/maria/project1/CMakeFiles --progress-num=1,2 "Built target graphics"
-.PHONY : includes/graphics/CMakeFiles/graphics.dir/all
-
-# Build rule for subdir invocation for target.
-includes/graphics/CMakeFiles/graphics.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maria/project1/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 includes/graphics/CMakeFiles/graphics.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/maria/project1/CMakeFiles 0
-.PHONY : includes/graphics/CMakeFiles/graphics.dir/rule
-
-# Convenience name for target.
-graphics: includes/graphics/CMakeFiles/graphics.dir/rule
-
-.PHONY : graphics
-
-# clean rule for target.
-includes/graphics/CMakeFiles/graphics.dir/clean:
-	$(MAKE) -f includes/graphics/CMakeFiles/graphics.dir/build.make includes/graphics/CMakeFiles/graphics.dir/clean
-.PHONY : includes/graphics/CMakeFiles/graphics.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

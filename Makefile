@@ -123,32 +123,6 @@ project/fast:
 	$(MAKE) -f CMakeFiles/project.dir/build.make CMakeFiles/project.dir/build
 .PHONY : project/fast
 
-#=============================================================================
-# Target rules for targets named utils
-
-# Build rule for target.
-utils: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 utils
-.PHONY : utils
-
-# fast build rule for target.
-utils/fast:
-	$(MAKE) -f includes/utils/CMakeFiles/utils.dir/build.make includes/utils/CMakeFiles/utils.dir/build
-.PHONY : utils/fast
-
-#=============================================================================
-# Target rules for targets named graphics
-
-# Build rule for target.
-graphics: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 graphics
-.PHONY : graphics
-
-# fast build rule for target.
-graphics/fast:
-	$(MAKE) -f includes/graphics/CMakeFiles/graphics.dir/build.make includes/graphics/CMakeFiles/graphics.dir/build
-.PHONY : graphics/fast
-
 ex.o: ex.cpp.o
 
 .PHONY : ex.o
@@ -185,8 +159,6 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... project"
-	@echo "... utils"
-	@echo "... graphics"
 	@echo "... ex.o"
 	@echo "... ex.i"
 	@echo "... ex.s"

@@ -273,22 +273,10 @@ MPFR_LIBRARIES_DIR:FILEPATH=/usr/lib/x86_64-linux-gnu
 boost_headers_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/boost_headers-1.71.0
 
 //Value Computed by CMake
-graphics_BINARY_DIR:STATIC=/home/maria/project1/includes/graphics
-
-//Value Computed by CMake
-graphics_SOURCE_DIR:STATIC=/home/maria/project1/includes/graphics
-
-//Value Computed by CMake
 project_BINARY_DIR:STATIC=/home/maria/project1
 
 //Value Computed by CMake
 project_SOURCE_DIR:STATIC=/home/maria/project1
-
-//Value Computed by CMake
-utils_BINARY_DIR:STATIC=/home/maria/project1/includes/utils
-
-//Value Computed by CMake
-utils_SOURCE_DIR:STATIC=/home/maria/project1/includes/utils
 
 
 ########################
@@ -303,7 +291,7 @@ Boost_DIR-ADVANCED:INTERNAL=1
 CGAL_Boost_USE_STATIC_LIBS-ADVANCED:INTERNAL=1
 //STRINGS property for variable: CGAL_CMAKE_EXACT_NT_BACKEND
 CGAL_CMAKE_EXACT_NT_BACKEND-STRINGS:INTERNAL=GMP_BACKEND;GMPXX_BACKEND;BOOST_GMP_BACKEND;BOOST_BACKEND;LEDA_BACKEND;MP_FLOAT_BACKEND;Default
-CGAL_EXECUTABLE_TARGETS:INTERNAL=project;project;project;project;project;project;project;utils;graphics;project;utils;graphics;project
+CGAL_EXECUTABLE_TARGETS:INTERNAL=project
 //CGAL library is configured to use GMP
 CGAL_USE_GMP:INTERNAL=TRUE
 //CGAL library is configured to use MPFR
@@ -412,7 +400,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=3
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP

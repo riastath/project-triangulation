@@ -1,1 +1,1 @@
-/usr/bin/c++     CMakeFiles/project.dir/ex.cpp.o  -o project  -lQt5::Widgets -lQt5::Gui -lQt5::Core /usr/lib/x86_64-linux-gnu/libgmpxx.so /usr/lib/x86_64-linux-gnu/libmpfr.so /usr/lib/x86_64-linux-gnu/libgmp.so -pthread 
+/usr/bin/c++     CMakeFiles/project.dir/ex.cpp.o  -o project  /usr/lib/x86_64-linux-gnu/libgmpxx.so /usr/lib/x86_64-linux-gnu/libmpfr.so /usr/lib/x86_64-linux-gnu/libgmp.so -pthread 
