@@ -1,3 +1,0 @@
-/home/gpnb/Projects/project/project1v2/project1/CMakeFiles/project.dir
-/home/gpnb/Projects/project/project1v2/project1/CMakeFiles/edit_cache.dir
-/home/gpnb/Projects/project/project1v2/project1/CMakeFiles/rebuild_cache.dir

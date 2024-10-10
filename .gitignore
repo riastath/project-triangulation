@@ -1,4 +1,5 @@
 # ignore everything
+./CMakeFiles
 * 
 
 # except for:
