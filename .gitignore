@@ -1,5 +1,6 @@
 # ignore everything
 CMakeFiles/
+CMakeCXXCompilerId.cpp
 * 
 
 # except for:
