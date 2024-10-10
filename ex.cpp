@@ -24,6 +24,7 @@ private:
     // points are ints 
     std::vector<int> points_x;
     std::vector<int> points_y;
+    std::vector<Point> point_vec;
     std::vector<std::pair<Point, Point>> additional_constraints;
     int num_points;
     int num_constraints;
@@ -42,21 +43,23 @@ public:
             bounds.push_back(bound.second.get_value<int>());
         }
 
-        for (pt::ptree::value_type &pointx : root.get_child("points_x")) {
-            points_x.push_back(pointx.second.get_value<int>());
+        // Get coordinates
+        for (pt::ptree::value_type &x : root.get_child("points_x")) {
+            points_x.push_back(x.second.get_value<int>());
         }
         
-        for (pt::ptree::value_type &pointy : root.get_child("points_y")) {
-            points_y.push_back(pointy.second.get_value<int>());
+        for (pt::ptree::value_type &y : root.get_child("points_y")) {
+            points_y.push_back(y.second.get_value<int>());
         }
+
 
         // Find out why this doesn't work 
         for (pt::ptree::value_type &add : root.get_child("additional_constraints")) {
 
 
             // what type is this ?? 
-            // std::cout << typeid(add.first).name() << std::endl;
-            // std::cout << typeid(add.second).name() << std::endl;
+            std::cout << typeid(add.first).name() << std::endl;  // this is a string
+            std::cout << typeid(add.second).name() << std::endl;
             // additional_constraints.push_back(std::make_pair(px, py));
             // additional_constraints.push_back(add.second.get_value<std::pair<Point, Point>>());
         }
@@ -74,7 +77,6 @@ public:
 };
 
 
-
 int main(void) {
     std::string filename = "tests/data.json";
     PSLG * graph = new PSLG(filename);
@@ -82,3 +84,4 @@ int main(void) {
 
     return 0;
 }
+
