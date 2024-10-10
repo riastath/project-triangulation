@@ -3,7 +3,7 @@
 
 # except for:
 !.gitignore
-!*.txt
+!CMakeLists.txt
 !*.cpp
 !*.hpp
 !*.sh
