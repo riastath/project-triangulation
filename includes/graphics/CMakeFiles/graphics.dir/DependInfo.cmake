@@ -1,21 +1,14 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
-  )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/maria/project1/includes/graphics/graphics.cpp" "/home/maria/project1/includes/graphics/CMakeFiles/graphics.dir/graphics.cpp.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
-
-# Preprocessor definitions for this target.
-set(CMAKE_TARGET_DEFINITIONS_CXX
-  "BOOST_ALL_NO_LIB"
-  "CGAL_USE_GMPXX=1"
   )
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/maria/project1/includes/graphics/graphics.cpp" "includes/graphics/CMakeFiles/graphics.dir/graphics.cpp.o" "gcc" "includes/graphics/CMakeFiles/graphics.dir/graphics.cpp.o.d"
   )
 
 # Targets to which this target links.

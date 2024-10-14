@@ -53,27 +53,40 @@ public:
         }
 
 
-        // Find out why this doesn't work 
         for (pt::ptree::value_type &add : root.get_child("additional_constraints")) {
 
+            // second -> the node's value, which is an [i, j] ptree represenation, so we can use get_child to get the child element
+            // and with front and back, we get the first and second elements in the ptree, so for example 5 and 6 in [5,6]
+            int i = add.second.get_child("").front().second.get_value<int>(); //  add.second.get_child("").front() is the first child, i 
+            int j = add.second.get_child("").back().second.get_value<int>();  //  add.second.get_child("").back() is the second child, j 
 
-            // what type is this ?? 
-            std::cout << typeid(add.first).name() << std::endl;  // this is a string
-            std::cout << typeid(add.second).name() << std::endl;
-            // additional_constraints.push_back(std::make_pair(px, py));
-            // additional_constraints.push_back(add.second.get_value<std::pair<Point, Point>>());
+            // Construct the points using the ints we got, i and j
+            Point px(points_x[i], points_y[i]);
+            Point py(points_x[j], points_y[j]);
+
+            // then make them a pair, and push to constraints
+            additional_constraints.push_back(std::make_pair(px, py));
         }
     }
 
     void printer() {
         std::cout << "uid is: " << uid << std::endl;
-        std::cout << "bounds: " << std::endl;
         for (int i = 0; i < bounds.size(); i++) {
             std::cout << bounds.at(i) << " ";
         }
         std::cout << std::endl;
+
+        // test to print point pairs in constraints
+        // with iterator?
+        std::vector<std::pair<Point, Point>>::iterator it;
+        for (it = additional_constraints.begin(); it != additional_constraints.end(); it++) {
+            Point px = it->first;
+            Point py = it->second;
+
+            std::cout << "first point (px) in pair is : " << px.x() << ", " << px.y() << std::endl;
+            std::cout << "second point (py) in pair is : " << py.x() << ", " << py.y() << std::endl;
+        }
     }
-    
 };
 
 
@@ -84,4 +97,3 @@ int main(void) {
 
     return 0;
 }
-
