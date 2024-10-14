@@ -26,6 +26,7 @@ private:
     std::vector<int> points_y;
     std::vector<Point> point_vec;
     std::vector<std::pair<Point, Point>> additional_constraints;
+    // std::vector<std::pair<int, int>> del_constr;
     int num_points;
     int num_constraints;
 
@@ -52,39 +53,57 @@ public:
             points_y.push_back(y.second.get_value<int>());
         }
 
+        for (int i = 0; i < points_x.size(); i++) {
+            point_vec.push_back(Point(points_x.at(i), points_y.at(i)));
+        }
 
+        // Find out why this doesn't work 
         for (pt::ptree::value_type &add : root.get_child("additional_constraints")) {
 
-            // second -> the node's value, which is an [i, j] ptree represenation, so we can use get_child to get the child element
-            // and with front and back, we get the first and second elements in the ptree, so for example 5 and 6 in [5,6]
-            int i = add.second.get_child("").front().second.get_value<int>(); //  add.second.get_child("").front() is the first child, i 
-            int j = add.second.get_child("").back().second.get_value<int>();  //  add.second.get_child("").back() is the second child, j 
 
-            // Construct the points using the ints we got, i and j
-            Point px(points_x[i], points_y[i]);
-            Point py(points_x[j], points_y[j]);
+            // what type is this ?? 
+            // std::cout << typeid(add.first).name() << std::endl;  // this is a string
+            // if only it were that easy XD. this is a ptree (lol)
+            // yes, every single pair of points is a ptree (why? idk, i guess it would be too easy otherwise?)
+            int graph_edge[2];
+            int x = 0;
+            for (pt::ptree::value_type &pedge : add.second) {
+                graph_edge[x] = pedge.second.get_value<int>();
+                x++;
+            }
 
-            // then make them a pair, and push to constraints
-            additional_constraints.push_back(std::make_pair(px, py));
+            // del_constr.push_back(std::make_pair(graph_edge[0], graph_edge[1]));
+
+            // std::cout << typeid(add.second).name() << std::endl;
+            std::pair<Point, Point> constr = std::make_pair(point_vec.at(graph_edge[0]), point_vec.at(graph_edge[1]));
+            additional_constraints.push_back(constr);
+            // additional_constraints.push_back(std::make_pair(px, py));
+            // additional_constraints.push_back(add.second.get_value<std::pair<Point, Point>>());
         }
     }
 
     void printer() {
         std::cout << "uid is: " << uid << std::endl;
+        std::cout << "bounds: " << std::endl;
         for (int i = 0; i < bounds.size(); i++) {
             std::cout << bounds.at(i) << " ";
         }
         std::cout << std::endl;
+    }
+    
+    void delaunay_passer(CDT* delaunay_instance) {
+        
+        // pass the points delaunay instance
+        for (const Point& p: point_vec){
+            delaunay_instance->insert(p);
+        }
 
-        // test to print point pairs in constraints
-        // with iterator?
-        std::vector<std::pair<Point, Point>>::iterator it;
-        for (it = additional_constraints.begin(); it != additional_constraints.end(); it++) {
-            Point px = it->first;
-            Point py = it->second;
-
-            std::cout << "first point (px) in pair is : " << px.x() << ", " << px.y() << std::endl;
-            std::cout << "second point (py) in pair is : " << py.x() << ", " << py.y() << std::endl;
+        // pass modified constraints
+        // for (const auto& constraint: del_constr) {
+        //     delaunay_instance->insert_constraint(point_vec[constraint.first], point_vec[constraint.second]);
+        // }
+        for (const auto& constraint: additional_constraints) {
+            delaunay_instance->insert_constraint(constraint.first, constraint.second);
         }
     }
 };
@@ -95,5 +114,10 @@ int main(void) {
     PSLG * graph = new PSLG(filename);
     graph->printer();
 
+    CDT cdt;
+    graph->delaunay_passer(&cdt);
+    CGAL::draw(cdt);
+
     return 0;
 }
+
