@@ -194,6 +194,13 @@ int main(void) {
     // Point c(1, 3);
     // bool res = graph->is_obtuse(a, b, c);
 
+    for (CDT::Face_handle fh: cdt.finite_face_handles()) {
+        std::cout << "flipable: " << cdt.is_flipable(fh,0) << std::endl;
+        cdt.flip(fh,0);  // from face fh, flip edge "facing" the corner 0
+        break;
+    }
+    // CGAL::draw(cdt);
+
     bool res = graph->is_obtuse(&cdt);
     std::cout << res << std::endl;
     if (res) std::cout << "Obtuse triangles exist in the instance" << std::endl;
