@@ -131,24 +131,51 @@ public:
         return degrees;
     }
 
-    // Function to check if triangle is non-obtuse by calculating angle degrees, using the function above
-    bool is_obtuse(Point a, Point b, Point c) {
-        double angle_A = angle(a, b, c);
-        double angle_B = angle(c, a, b);
-        double angle_C = angle(b, a, c);
+    // // Function to check if triangle is non-obtuse by calculating angle degrees, using the function above
+    // bool is_obtuse(Point a, Point b, Point c) {
+    //     double angle_A = angle(a, b, c);
+    //     double angle_B = angle(c, a, b);
+    //     double angle_C = angle(b, a, c);
 
-        if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
-            return true;    // triangle is obtuse
-        }
-        return false;
-    }
-
-    // to check for the actual triangulation, modify given a cdt instance 
-    // that iterates with finite_faces methods and checks the vertices, after studying how it works
-    // bool is_obtuse(CDT* instance ) {
-
+    //     if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
+    //         return true;    // triangle is obtuse
+    //     }
     //     return false;
     // }
+
+    // to check for the actual triangulation, modify given a cdt instance 
+    bool is_obtuse(CDT* instance) {
+        CDT::Finite_faces_iterator it;  // initialize iterator
+        for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
+            // need to examine every vertex using the iterator, and find the 3 points of each triangle
+            // these examine the 1st, 2nd and 3rd vertex respectively.
+            // vertex() apparently returns a handle, which is akin to a pointer to an object.
+            // so, using this we get the point with its coordinates (x,y) from the corresponding vertex.
+            Point a = it->vertex(0)->point();
+            Point b = it->vertex(1)->point();
+            Point c = it->vertex(2)->point();
+
+            // std::cout << "Points of the current triangle :" << std::endl;
+            // std::cout << a << std::endl;
+            // std::cout << b << std::endl;
+            // std::cout << c << std::endl;
+
+            double angle_A = angle(a, b, c);
+            double angle_B = angle(c, a, b);
+            double angle_C = angle(b, a, c);
+
+            // std::cout << "Angles of the current triangle :" << std::endl;
+            // std:: cout << angle_A << std::endl;
+            // std::cout << angle_B << std::endl;
+            // std::cout << angle_C << std:: endl;
+
+            if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
+                return true;    // an obtuse triangle is found in the instance
+            }
+        }
+
+        return false;   // no obtuse triangle found in the instance
+    }
 };
 
 
@@ -161,18 +188,16 @@ int main(void) {
     graph->delaunay_passer(&cdt);
     // CGAL::draw(cdt);
 
-    // testing with a triangle that should be obtuse
-    Point a(0, 0);
-    Point b(2, 0);
-    Point c(1, 3);
-    bool res = graph->is_obtuse(a, b, c);
-    std::cout << res << std::endl;
+    // // testing with a triangle that should be obtuse (this is for the previous function version)
+    // Point a(0, 0);
+    // Point b(2, 0);
+    // Point c(1, 3);
+    // bool res = graph->is_obtuse(a, b, c);
 
-    // this is useful for iterating over faces, so i'm keeping it here
-    // Delaunay::Finite_faces_iterator it;
-    // for (it = dt.finite_faces_begin(); it != dt.finite_faces_end(); it++) {
-    //     std::cout << dt.triangle(it) << std::endl;
-    // }
+    bool res = graph->is_obtuse(&cdt);
+    std::cout << res << std::endl;
+    if (res) std::cout << "Obtuse triangles exist in the instance" << std::endl;
+    else std::cout << "No obtuse triangles in the instance!" << std::endl;
 
     return 0;
 }
