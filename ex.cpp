@@ -127,8 +127,8 @@ public:
     // Function to check if triangle is non-obtuse by calculating angle degrees, using the function above
     bool is_obtuse(Point a, Point b, Point c) {
         double angle_A = angle(a, b, c);
-        double angle_B = angle(c, a, b);
-        double angle_C = angle(b, a, c);
+        double angle_B = angle(b, a, c);
+        double angle_C = angle(c, a, b);
         if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
             return true;    // triangle is obtuse
         }
@@ -157,8 +157,8 @@ public:
             // std::cout << c << std::endl;
 
             double angle_A = angle(a, b, c);
-            double angle_B = angle(c, a, b);
-            double angle_C = angle(b, a, c);
+            double angle_B = angle(b, a, c);
+            double angle_C = angle(c, a, b);
 
             // std::cout << "Angles of the current triangle :" << std::endl;
             // std:: cout << angle_A << std::endl;
@@ -206,8 +206,8 @@ public:
             Point c = it->vertex(2)->point();
 
             double angle_A = angle(a, b, c);
-            double angle_B = angle(c, a, b);
-            double angle_C = angle(b, a, c);
+            double angle_B = angle(b, a, c);
+            double angle_C = angle(c, a, b);
 
             if (angle_A > 90.0) {
                 Point mid = CGAL::midpoint(b, c);
