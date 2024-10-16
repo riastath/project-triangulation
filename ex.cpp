@@ -176,7 +176,7 @@ public:
 
 
 
-    void insert_steiner(CDT *instance) {
+    void insert_steiner_center(CDT *instance) {
         CDT::Finite_faces_iterator it;
         std::vector<Point> steiner_points;  // to insert the steiner points
 
@@ -190,6 +190,37 @@ public:
                 steiner_points.push_back(center);
             }
         }
+        for (const Point& p: steiner_points) {
+            instance->insert(p);
+        }
+        std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
+    }
+
+    void insert_steiner_mid(CDT *instance) {
+        CDT::Finite_faces_iterator it;
+        std::vector<Point> steiner_points;  // to insert the steiner points
+
+        for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
+            Point a = it->vertex(0)->point();
+            Point b = it->vertex(1)->point();
+            Point c = it->vertex(2)->point();
+
+            double angle_A = angle(a, b, c);
+            double angle_B = angle(c, a, b);
+            double angle_C = angle(b, a, c);
+
+            if (angle_A > 90.0) {
+                Point mid = CGAL::midpoint(b, c);
+                steiner_points.push_back(mid);
+            } else if (angle_B > 90.0) {
+                Point mid = CGAL::midpoint(a, c);
+                steiner_points.push_back(mid);
+            } else if( angle_C > 90.0) {
+                Point mid = CGAL::midpoint(a, b);
+                steiner_points.push_back(mid);
+            }
+        }
+
         for (const Point& p: steiner_points) {
             instance->insert(p);
         }
@@ -221,7 +252,8 @@ int main(void) {
     // if (res) std::cout << "Obtuse triangles exist in the instance" << std::endl;
     // else std::cout << "No obtuse triangles in the instance!" << std::endl;
 
-    graph->insert_steiner(&cdt);
+    // graph->insert_steiner_center(&cdt);
+    graph->insert_steiner_mid(&cdt);
     graph->is_obtuse_gen(&cdt);
 
     return 0;
