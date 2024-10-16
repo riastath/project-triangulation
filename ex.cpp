@@ -29,7 +29,7 @@ private:
     std::vector<int> points_y;
     std::vector<Point> point_vec;
     std::vector<std::pair<Point, Point>> additional_constraints;
-    // std::vector<std::pair<int, int>> del_constr;
+    // std::vector<Point> steiner_points;  // to insert the steiner points
     int num_points;
     int num_constraints;
 
@@ -61,22 +61,13 @@ public:
             point_vec.push_back(Point(points_x.at(i), points_y.at(i)));
         }
 
-        // Find out why this doesn't work 
         for (pt::ptree::value_type &add : root.get_child("additional_constraints")) {
-
-
-            // what type is this ?? 
-            // std::cout << typeid(add.first).name() << std::endl;  // this is a string
-            // if only it were that easy XD. this is a ptree (lol)
-            // yes, every single pair of points is a ptree (why? idk, i guess it would be too easy otherwise?)
             int graph_edge[2];
             int x = 0;
             for (pt::ptree::value_type &pedge : add.second) {
                 graph_edge[x] = pedge.second.get_value<int>();
                 x++;
             }
-
-            // del_constr.push_back(std::make_pair(graph_edge[0], graph_edge[1]));
 
             std::pair<Point, Point> constr = std::make_pair(point_vec.at(graph_edge[0]), point_vec.at(graph_edge[1]));
             additional_constraints.push_back(constr);
@@ -131,8 +122,25 @@ public:
         return degrees;
     }
 
+
+
+    // Function to check if triangle is non-obtuse by calculating angle degrees, using the function above
+    bool is_obtuse(Point a, Point b, Point c) {
+        double angle_A = angle(a, b, c);
+        double angle_B = angle(c, a, b);
+        double angle_C = angle(b, a, c);
+        if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
+            return true;    // triangle is obtuse
+        }
+        return false;
+    }
+
+
+
+
+
     // to check for the actual triangulation, modify given a cdt instance 
-    bool is_obtuse(CDT* instance) {
+    bool is_obtuse_gen(CDT* instance) {
         CDT::Finite_faces_iterator it;  // initialize iterator
         for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
             // need to examine every vertex using the iterator, and find the 3 points of each triangle
@@ -142,10 +150,6 @@ public:
             Point a = it->vertex(0)->point();
             Point b = it->vertex(1)->point();
             Point c = it->vertex(2)->point();
-
-            Point center = CGAL::centroid(a, b, c);
-            instance->insert(center);
-
 
             // std::cout << "Points of the current triangle :" << std::endl;
             // std::cout << a << std::endl;
@@ -162,11 +166,35 @@ public:
             // std::cout << angle_C << std:: endl;
 
             if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
-                return true;    // an obtuse triangle is found in the instance
+                // return true;    // an obtuse triangle is found in the instance
+                std::cout << "found" << std::endl;  // to test
             }
         }
 
         return false;   // no obtuse triangle found in the instance
+    }
+
+
+
+    void insert_steiner(CDT *instance) {
+        CDT::Finite_faces_iterator it;
+        std::vector<Point> steiner_points;  // to insert the steiner points
+
+        for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
+            Point a = it->vertex(0)->point();
+            Point b = it->vertex(1)->point();
+            Point c = it->vertex(2)->point();
+
+            if (is_obtuse(a, b, c)) {
+                Point center = CGAL::centroid(a, b, c);
+                steiner_points.push_back(center);
+            }
+        }
+        for (const Point& p: steiner_points) {
+            instance->insert(p);
+        }
+        std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
+
     }
 };
 
@@ -187,11 +215,14 @@ int main(void) {
     // }
     // CGAL::draw(cdt);
 
-    bool res = graph->is_obtuse(&cdt);
-    CGAL::draw(cdt);
-    std::cout << res << std::endl;
-    if (res) std::cout << "Obtuse triangles exist in the instance" << std::endl;
-    else std::cout << "No obtuse triangles in the instance!" << std::endl;
+    // bool res = graph->is_obtuse(&cdt);
+    // CGAL::draw(cdt);
+    // std::cout << res << std::endl;
+    // if (res) std::cout << "Obtuse triangles exist in the instance" << std::endl;
+    // else std::cout << "No obtuse triangles in the instance!" << std::endl;
+
+    graph->insert_steiner(&cdt);
+    graph->is_obtuse_gen(&cdt);
 
     return 0;
 }
