@@ -131,18 +131,6 @@ public:
         return degrees;
     }
 
-    // // Function to check if triangle is non-obtuse by calculating angle degrees, using the function above
-    // bool is_obtuse(Point a, Point b, Point c) {
-    //     double angle_A = angle(a, b, c);
-    //     double angle_B = angle(c, a, b);
-    //     double angle_C = angle(b, a, c);
-
-    //     if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
-    //         return true;    // triangle is obtuse
-    //     }
-    //     return false;
-    // }
-
     // to check for the actual triangulation, modify given a cdt instance 
     bool is_obtuse(CDT* instance) {
         CDT::Finite_faces_iterator it;  // initialize iterator
@@ -154,6 +142,10 @@ public:
             Point a = it->vertex(0)->point();
             Point b = it->vertex(1)->point();
             Point c = it->vertex(2)->point();
+
+            Point center = CGAL::centroid(a, b, c);
+            instance->insert(center);
+
 
             // std::cout << "Points of the current triangle :" << std::endl;
             // std::cout << a << std::endl;
@@ -188,20 +180,15 @@ int main(void) {
     graph->delaunay_passer(&cdt);
     // CGAL::draw(cdt);
 
-    // // testing with a triangle that should be obtuse (this is for the previous function version)
-    // Point a(0, 0);
-    // Point b(2, 0);
-    // Point c(1, 3);
-    // bool res = graph->is_obtuse(a, b, c);
-
-    for (CDT::Face_handle fh: cdt.finite_face_handles()) {
-        std::cout << "flipable: " << cdt.is_flipable(fh,0) << std::endl;
-        cdt.flip(fh,0);  // from face fh, flip edge "facing" the corner 0
-        break;
-    }
+    // for (CDT::Face_handle fh: cdt.finite_face_handles()) {
+    //     std::cout << "flipable: " << cdt.is_flipable(fh,0) << std::endl;
+    //     cdt.flip(fh,0);  // from face fh, flip edge "facing" the corner 0
+    //     break;
+    // }
     // CGAL::draw(cdt);
 
     bool res = graph->is_obtuse(&cdt);
+    CGAL::draw(cdt);
     std::cout << res << std::endl;
     if (res) std::cout << "Obtuse triangles exist in the instance" << std::endl;
     else std::cout << "No obtuse triangles in the instance!" << std::endl;
