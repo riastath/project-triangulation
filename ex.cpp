@@ -175,7 +175,6 @@ public:
     }
 
 
-
     void insert_steiner_center(CDT *instance) {
         CDT::Finite_faces_iterator it;
         std::vector<Point> steiner_points;  // to insert the steiner points
@@ -190,6 +189,7 @@ public:
                 steiner_points.push_back(center);
             }
         }
+
         for (const Point& p: steiner_points) {
             instance->insert(p);
         }
@@ -215,7 +215,7 @@ public:
             } else if (angle_B > 90.0) {
                 Point mid = CGAL::midpoint(a, c);
                 steiner_points.push_back(mid);
-            } else if( angle_C > 90.0) {
+            } else if (angle_C > 90.0) {
                 Point mid = CGAL::midpoint(a, b);
                 steiner_points.push_back(mid);
             }
@@ -225,7 +225,79 @@ public:
             instance->insert(p);
         }
         std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
+    }
 
+    // Third steiner point method : insert a steiner point so that the obtuse angle is bisected
+    void insert_steiner_bisection(CDT *instance) {
+        CDT::Finite_faces_iterator it;
+        std::vector<Point> steiner_points;
+
+        for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
+            Point a = it->vertex(0)->point();
+            Point b = it->vertex(1)->point();
+            Point c = it->vertex(2)->point();
+
+            double angle_A = angle(a, b, c);
+            double angle_B = angle(b, a, c);
+            double angle_C = angle(c, a, b);
+
+            Point obtuse_vertex;
+            Point p_a, p_b;
+            // Vector edge_a, edge_b;
+            double length_a, length_b;
+
+            // Need to find the obtuse vertex and use the formula from the bisection theorem for angles, to find the bisector
+            // formula is ∥BC∥ * BA + ∥BA∥ * BC if the obtuse angle is B, for example
+
+            if (angle_A > 90.0) {
+                // I need ab and ac
+                obtuse_vertex = a;
+                p_a = b;
+                p_b = c;  
+                // edge_a = b - a;
+                // edge_b = c - a;
+                // length_a = std::sqrt(edge_a.squared_length());
+                // length_b = std::sqrt(edge_b.squared_length());              
+            } else if (angle_B > 90.0) {
+                // I need ab, bc
+                obtuse_vertex = b;
+                p_a = a;
+                p_b = c; 
+                // edge_a = b - a;
+                // edge_b = c - b;
+                // length_a = std::sqrt(edge_a.squared_length());
+                // length_b = std::sqrt(edge_b.squared_length());
+            } else if (angle_C > 90.0) {
+                // I need ac and bc
+                obtuse_vertex = c;
+                p_a = a;
+                p_b = b;
+                // edge_a = c - a ;
+                // edge_b = c - b;
+                // length_a = std::sqrt(edge_a.squared_length());
+                // length_b = std::sqrt(edge_b.squared_length());
+            }
+
+            double ratio_a = length_a / (length_a + length_b);
+            double ratio_b = length_b / (length_a + length_b);
+
+            // Vector bisector = length_b * edge_a + length_a * edge_b;
+
+            // can't find intersection point with cgal vectors, so i have to find the bisection point another way
+            // use the equation to find the point, using the coordinates of the points left
+            Point bisection_point {
+                ratio_a * p_a.x() + ratio_b * p_b.x(),
+                ratio_a * p_a.y() + ratio_b * p_b.y(),
+            };
+
+            steiner_points.push_back(bisection_point);
+
+            for (const Point& p: steiner_points) {
+                instance->insert(p);
+            }
+            std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
+
+        }
     }
 };
 
@@ -253,8 +325,12 @@ int main(void) {
     // else std::cout << "No obtuse triangles in the instance!" << std::endl;
 
     // graph->insert_steiner_center(&cdt);
-    graph->insert_steiner_mid(&cdt);
+    // graph->insert_steiner_mid(&cdt);
+    // graph->is_obtuse_gen(&cdt);
+
+    graph->insert_steiner_bisection(&cdt);
     graph->is_obtuse_gen(&cdt);
+
 
     return 0;
 }
