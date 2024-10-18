@@ -245,44 +245,34 @@ public:
 
             Point obtuse_vertex;
             Point p_a, p_b;
-            // Vector edge_a, edge_b;
-            double length_a, length_b;
+            double length_a = 0.0, length_b = 0.0;
 
-            // Need to find the obtuse vertex and use the formula from the bisection theorem for angles, to find the bisector
-            // formula is ∥BC∥ * BA + ∥BA∥ * BC if the obtuse angle is B, for example
-
+            // Need to find the obtuse vertex and use the formula from the bisection theorem for angles, to find the bisector -> scrapped, using points?
             if (angle_A > 90.0) {
                 // I need ab and ac
                 obtuse_vertex = a;
                 p_a = b;
-                p_b = c;  
-                // edge_a = b - a;
-                // edge_b = c - a;
-                // length_a = std::sqrt(edge_a.squared_length());
-                // length_b = std::sqrt(edge_b.squared_length());              
+                p_b = c;             
             } else if (angle_B > 90.0) {
                 // I need ab, bc
                 obtuse_vertex = b;
                 p_a = a;
                 p_b = c; 
-                // edge_a = b - a;
-                // edge_b = c - b;
-                // length_a = std::sqrt(edge_a.squared_length());
-                // length_b = std::sqrt(edge_b.squared_length());
             } else if (angle_C > 90.0) {
                 // I need ac and bc
                 obtuse_vertex = c;
                 p_a = a;
                 p_b = b;
-                // edge_a = c - a ;
-                // edge_b = c - b;
-                // length_a = std::sqrt(edge_a.squared_length());
-                // length_b = std::sqrt(edge_b.squared_length());
-            }
+            } else continue;    // no obtuse angle -> check next face
+
+            // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex + points 
+            length_a = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_a));
+            length_b = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_b));
 
             double ratio_a = length_a / (length_a + length_b);
             double ratio_b = length_b / (length_a + length_b);
 
+            // formula is ∥BC∥ * BA + ∥BA∥ * BC if the obtuse angle is B, for example
             // Vector bisector = length_b * edge_a + length_a * edge_b;
 
             // can't find intersection point with cgal vectors, so i have to find the bisection point another way
@@ -294,12 +284,13 @@ public:
 
             steiner_points.push_back(bisection_point);
 
-            for (const Point& p: steiner_points) {
-                instance->insert(p);
-            }
-            std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
-
         }
+
+        // Insert all the steiner points at the end 
+        for (const Point& p: steiner_points) {
+            instance->insert(p);
+        }
+        std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
     }
 
     bool face_is_infinite(CDT::Face_handle face, CDT *instance) {
@@ -414,10 +405,15 @@ int main(void) {
     // graph->is_obtuse_gen(&cdt);
 
     // graph->insert_steiner_bisection(&cdt);
+    // graph->is_obtuse_gen(&cdt);
+
     std::cout << "Before fliping" << std::endl;
     graph->is_obtuse_gen(&cdt);
     graph->flipper_not_0(&cdt);
     std::cout << "After fliping" << std::endl;
+    // graph->insert_steiner_center(&cdt);
+    // graph->insert_steiner_mid(&cdt);
+    graph->insert_steiner_bisection(&cdt);
     graph->is_obtuse_gen(&cdt);
     CGAL::draw(cdt);
 
