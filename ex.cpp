@@ -141,6 +141,7 @@ public:
 
     // to check for the actual triangulation, modify given a cdt instance 
     bool is_obtuse_gen(CDT* instance) {
+        int number_of_obtuce = 0;
         CDT::Finite_faces_iterator it;  // initialize iterator
         for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
             // need to examine every vertex using the iterator, and find the 3 points of each triangle
@@ -168,9 +169,10 @@ public:
             if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
                 // return true;    // an obtuse triangle is found in the instance
                 std::cout << "found" << std::endl;  // to test
+                number_of_obtuce++;
             }
         }
-
+        std::cout << "///// obtuce triangles foud: " << number_of_obtuce << " \\\\\\\\\\" << std::endl; 
         return false;   // no obtuse triangle found in the instance
     }
 
@@ -299,6 +301,89 @@ public:
 
         }
     }
+
+    bool face_is_infinite(CDT::Face_handle face, CDT *instance) {
+        for (int i = 0; i < 3; i++) {
+            // std::cout << face->vertex(i)->point() << std::endl;
+            if (face->vertex(i) == instance->infinite_vertex()) {
+                // std::cout << "hello?" << std::endl;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void flipper_not_0(CDT *cdt) {
+        std::vector<std::pair<CDT::Face_handle, int>> flip_vec; 
+        std::vector<CDT::Face_handle> fliped_neighbors;
+        // std::pair<Point, Point> constr = std::make_pair(point_vec.at(graph_edge[0]), point_vec.at(graph_edge[1]));
+
+        int i = 1;
+        for (CDT::Face_handle fh: cdt->finite_face_handles()) {
+
+            // std::cout << "face " << i << " has neighbors: " << std::endl;
+            // for (int j = 0; j < 3; j++) {
+            //     std::string res = face_is_infinite(fh->neighbor(j), &cdt) ? "invalid" : "valid";
+            //     std::cout << j << ": " << res << std::endl;
+            // }
+            for (int j = 0; j < 3; j++) {
+                // check if neighbor exists to flip
+                
+                if (!is_obtuse(fh->vertex(j)->point(), fh->vertex((j+1)%3)->point(), fh->vertex((j+2)%3)->point())) {
+                    continue;
+                }
+
+                if (face_is_infinite(fh->neighbor(j), cdt)){
+                    continue;
+                }
+                
+                // has the face been in a flip
+                auto it = find(fliped_neighbors.begin(), fliped_neighbors.end(), fh);
+                if (it != fliped_neighbors.end()) {
+                    std::cout << "face handle allready in vector" << std::endl;
+                    continue;
+                }
+
+                // has the neighbor initiated a flip
+                CDT::Face_handle key = fh->neighbor(j);
+                auto it2 = find_if(flip_vec.begin(), flip_vec.end(),[key](const auto& p) { return p.first == key; });
+                if (it2 != flip_vec.end()) {
+                    std::cout << "neighbor face handle allready in vector" << std::endl;
+                    continue;
+                }
+
+                // has the neighbor been in a flip
+                auto it3 = find(fliped_neighbors.begin(), fliped_neighbors.end(), fh->neighbor(j));
+                if (it3 != fliped_neighbors.end()) {
+                    std::cout << "neighbor face handle has been fliped" << std::endl;
+                    continue;
+                }
+
+                // CDT::Face_handle key = fh->neighbor(j);
+                // auto it = find_if(flip_vec.begin(), flip_vec.end(),[key](const auto& p) { return p.first == key; });
+                // if (it != flip_vec.end()) {
+                //     std::cout << "neighbor face handle allready in vector" << std::endl;
+                //     continue;
+                // }
+
+                std::pair<CDT::Face_handle, int> flip_item = std::make_pair(fh, j);
+                flip_vec.push_back(flip_item);
+                fliped_neighbors.push_back(fh->neighbor(j));
+            }
+            // std::cout << "### end ###" << std::endl;
+        }
+
+        std::cout << "to flip:" << flip_vec.size() << std::endl;
+        for (int i = 0; i < flip_vec.size(); i++) {
+            std::cout << "flip" << std::endl;
+            std::pair<CDT::Face_handle, int> flip_item = flip_vec.at(i);
+            std::cout << flip_item.first->vertex(0)->point() << "  " 
+            << flip_item.first->vertex(1)->point() << "  " 
+            << flip_item.first->vertex(2)->point() << std::endl;
+            cdt->flip(flip_item.first, flip_item.second);
+        }
+        std::cout << "##### end of flips #####" << std::endl;
+    }
 };
 
 
@@ -328,10 +413,14 @@ int main(void) {
     // graph->insert_steiner_mid(&cdt);
     // graph->is_obtuse_gen(&cdt);
 
-    graph->insert_steiner_bisection(&cdt);
+    // graph->insert_steiner_bisection(&cdt);
+    std::cout << "Before fliping" << std::endl;
     graph->is_obtuse_gen(&cdt);
+    graph->flipper_not_0(&cdt);
+    std::cout << "After fliping" << std::endl;
+    graph->is_obtuse_gen(&cdt);
+    CGAL::draw(cdt);
 
 
     return 0;
 }
-
