@@ -29,7 +29,7 @@ private:
     std::vector<int> points_y;
     std::vector<Point> point_vec;
     std::vector<std::pair<Point, Point>> additional_constraints;
-    // std::vector<Point> steiner_points;  // to insert the steiner points
+    std::vector<Point> steiner_points;  // to insert the steiner points
     int num_points;
     int num_constraints;
 
@@ -98,6 +98,10 @@ public:
         for (const auto& constraint: additional_constraints) {
             delaunay_instance->insert_constraint(constraint.first, constraint.second);
         }
+    }
+
+    void insert_steiner_point(Point point) {
+        steiner_points.push_back(point);
     }
 
     // Function to calculate angles using the dot product method -> used to check for non-obtuse triangles later
@@ -179,7 +183,7 @@ public:
 
     void insert_steiner_center(CDT *instance) {
         CDT::Finite_faces_iterator it;
-        std::vector<Point> steiner_points;  // to insert the steiner points
+        // std::vector<Point> steiner_points;  // to insert the steiner points
 
         for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
             Point a = it->vertex(0)->point();
@@ -188,7 +192,7 @@ public:
 
             if (is_obtuse(a, b, c)) {
                 Point center = CGAL::centroid(a, b, c);
-                steiner_points.push_back(center);
+                insert_steiner_point(center);
             }
         }
 
@@ -200,7 +204,7 @@ public:
 
     void insert_steiner_mid(CDT *instance) {
         CDT::Finite_faces_iterator it;
-        std::vector<Point> steiner_points;  // to insert the steiner points
+        // std::vector<Point> steiner_points;  // to insert the steiner points
 
         for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
             Point a = it->vertex(0)->point();
@@ -213,13 +217,17 @@ public:
 
             if (angle_A > 90.0) {
                 Point mid = CGAL::midpoint(b, c);
-                steiner_points.push_back(mid);
+                // steiner_points.push_back(mid);
+                insert_steiner_point(mid);
             } else if (angle_B > 90.0) {
                 Point mid = CGAL::midpoint(a, c);
-                steiner_points.push_back(mid);
+                // steiner_points.push_back(mid);
+                insert_steiner_point(mid);
+
             } else if (angle_C > 90.0) {
                 Point mid = CGAL::midpoint(a, b);
-                steiner_points.push_back(mid);
+                // steiner_points.push_back(mid);
+                insert_steiner_point(mid);
             }
         }
 
@@ -232,7 +240,7 @@ public:
     // Third steiner point method : insert a steiner point so that the obtuse angle is bisected
     void insert_steiner_bisection(CDT *instance) {
         CDT::Finite_faces_iterator it;
-        std::vector<Point> steiner_points;
+        // std::vector<Point> steiner_points;
 
         for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
             Point a = it->vertex(0)->point();
@@ -282,8 +290,8 @@ public:
                 ratio_a * p_a.y() + ratio_b * p_b.y(),
             };
 
-            steiner_points.push_back(bisection_point);
-
+            // steiner_points.push_back(bisection_point);
+            insert_steiner_point(bisection_point);
         }
 
         // Insert all the steiner points at the end 
