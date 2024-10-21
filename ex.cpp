@@ -24,7 +24,6 @@ class PSLG {
 private:
     std::string uid;
     std::vector<int> bounds;
-    // points are ints 
     std::vector<int> points_x;
     std::vector<int> points_y;
     std::vector<Point> point_vec;
@@ -74,6 +73,18 @@ public:
         }
 
     }
+
+    // get uid -> probably redundant
+    std::string get_instance_uid() const {
+        return uid;
+    }
+
+    // get steiner points
+    std::vector<Point> get_steiner() const {
+        return steiner_points;
+    }
+    
+    // and also get edges here 
 
     void printer() {
         std::cout << "uid is: " << uid << std::endl;
@@ -383,6 +394,58 @@ public:
         }
         std::cout << "##### end of flips #####" << std::endl;
     }
+
+    void produce_output() {
+        pt::ptree root;
+        root.put("content_type", "CG_SHOP_2025_Solution");
+        root.put("instance_uid", uid); // this must be the instance id we got from input? 
+        
+        // trees to insert the rest of the data
+        pt::ptree steiner_points_x, steiner_points_y, edges;
+
+        // followed that one web page's example like in input, "adding a list of values"
+        for (Point point : steiner_points) {
+            // need to convert to string first ? -> no, this is for fractions
+            // std::string x_string = std::to_string(point.x());
+            // std::string y_string = std::to_string(point.y());
+
+            // the ones that will be inserted
+            pt::ptree x_node, y_node;
+            x_node.put("",point.x());
+            y_node.put("", point.y());
+
+            steiner_points_x.push_back(std::make_pair("", x_node));
+            steiner_points_y.push_back(std::make_pair("", y_node));
+        }
+
+        // add these points to the root of the tree 
+        root.add_child("steiner_points_x", steiner_points_x);
+        root.add_child("steiner_points_y", steiner_points_y);
+
+        // now, create the output edges
+        for (std::pair<Point, Point> edge : additional_constraints) {
+            pt::ptree edge_node;
+            pt::ptree p1_tree, p2_tree; // p1 and p2 are basically the positions of the two points
+
+            // we need to find where the two points are in the point vector 
+            // i don't really like doing it like this, maybe find another way similar to the input one 
+            auto it1 = std::find(point_vec.begin(), point_vec.end(), edge.first);
+            auto it2 = std::find(point_vec.begin(), point_vec.end(), edge.second);
+            int p1_pos = std::distance(point_vec.begin(), it1);
+            int p2_pos = std::distance(point_vec.begin(), it2);
+
+            p1_tree.put("", p1_pos);
+            p2_tree.put("", p2_pos);
+            edge_node.push_back(std::make_pair("", p1_tree));
+            edge_node.push_back(std::make_pair("", p2_tree));
+
+            edges.push_back(std::make_pair("", edge_node));
+        }
+
+        root.add_child("edges", edges);
+
+        write_json(std::cout, root);    // with this, we print the output (can also redirect to an output file)
+    }
 };
 
 
@@ -423,8 +486,10 @@ int main(void) {
     // graph->insert_steiner_mid(&cdt);
     graph->insert_steiner_bisection(&cdt);
     graph->is_obtuse_gen(&cdt);
-    CGAL::draw(cdt);
+    // CGAL::draw(cdt);
 
+    // -- Starting here, testing for the output json using property tree -- //
+    graph->produce_output();
 
     return 0;
 }
