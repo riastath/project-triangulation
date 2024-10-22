@@ -1,5 +1,6 @@
 #include "pslg.h"
 
+// Constructor
 PSLG::PSLG(std::string filename) {
     pt::ptree root;
     pt:read_json(filename, root);
@@ -45,12 +46,12 @@ std::string PSLG::get_instance_uid() {
     return uid;
 }
     
-
 // get steiner points
 std::vector<Point> PSLG::get_steiner() {
     return steiner_points;
 }
-    
+
+// To print class members -> for testing
 void PSLG::printer() {
     std::cout << "uid is: " << uid << std::endl;
     std::cout << "bounds: " << std::endl;
@@ -59,9 +60,8 @@ void PSLG::printer() {
     }
     std::cout << std::endl;
 }
-    
+
 void PSLG::delaunay_passer(CDT* delaunay_instance) {
-        
     // pass the points delaunay instance
     for (const Point& p: point_vec){
         delaunay_instance->insert(p);
@@ -76,11 +76,12 @@ void PSLG::delaunay_passer(CDT* delaunay_instance) {
     }
 }
 
+// Simply insert the point in the steiner vector 
 void PSLG::insert_steiner_point(Point point) {
     steiner_points.push_back(point);
 }
 
-// Function to calculate angles using the dot product method -> used to check for non-obtuse triangles later
+// Function to calculate angles using the dot product method. Used to check for non-obtuse triangles later.
 double PSLG::angle(Point a, Point b, Point c) {
     // calculating the vectors needed for the dot product formula
     Vector u = b - a;
@@ -116,14 +117,14 @@ bool PSLG::is_obtuse(Point a, Point b, Point c) {
 }
 
 
-// to check for the actual triangulation, modify given a cdt instance 
+// Version 2 of the obtuse checking function, to check for the actual triangulation (not just a triangle given)
 bool PSLG::is_obtuse_gen(CDT* instance) {
     int number_of_obtuce = 0;
     CDT::Finite_faces_iterator it;  // initialize iterator
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
-        // need to examine every vertex using the iterator, and find the 3 points of each triangle
+        // we need to examine every vertex using the iterator, and find the 3 points of each triangle
         // these examine the 1st, 2nd and 3rd vertex respectively.
-        // vertex() apparently returns a handle, which is akin to a pointer to an object.
+        // vertex() returns a handle, which is akin to a pointer to an object,
         // so, using this we get the point with its coordinates (x,y) from the corresponding vertex.
         Point a = it->vertex(0)->point();
         Point b = it->vertex(1)->point();
@@ -153,10 +154,9 @@ bool PSLG::is_obtuse_gen(CDT* instance) {
     return false;   // no obtuse triangle found in the instance
 }
 
-
+// Steiner point method 1 : insert in center 
 void PSLG::insert_steiner_center(CDT *instance) {
     CDT::Finite_faces_iterator it;
-    // std::vector<Point> steiner_points;  // to insert the steiner points
 
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
         Point a = it->vertex(0)->point();
@@ -175,9 +175,9 @@ void PSLG::insert_steiner_center(CDT *instance) {
     std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }
 
+// Steiner point method 2 : insert midpoint
 void PSLG::insert_steiner_mid(CDT *instance) {
     CDT::Finite_faces_iterator it;
-    // std::vector<Point> steiner_points;  // to insert the steiner points
 
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
         Point a = it->vertex(0)->point();
@@ -190,16 +190,13 @@ void PSLG::insert_steiner_mid(CDT *instance) {
 
         if (angle_A > 90.0) {
             Point mid = CGAL::midpoint(b, c);
-            // steiner_points.push_back(mid);
             insert_steiner_point(mid);
         } else if (angle_B > 90.0) {
             Point mid = CGAL::midpoint(a, c);
-            // steiner_points.push_back(mid);
             insert_steiner_point(mid);
 
         } else if (angle_C > 90.0) {
             Point mid = CGAL::midpoint(a, b);
-            // steiner_points.push_back(mid);
             insert_steiner_point(mid);
         }
     }
@@ -210,10 +207,9 @@ void PSLG::insert_steiner_mid(CDT *instance) {
     std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }
 
-// Third steiner point method : insert a steiner point so that the obtuse angle is bisected
+// Steiner point method 3 : insert a steiner point so that the obtuse angle is bisected
 void PSLG::insert_steiner_bisection(CDT *instance) {
     CDT::Finite_faces_iterator it;
-    // std::vector<Point> steiner_points;
 
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
         Point a = it->vertex(0)->point();
@@ -228,14 +224,13 @@ void PSLG::insert_steiner_bisection(CDT *instance) {
         Point p_a, p_b;
         double length_a = 0.0, length_b = 0.0;
 
-        // Need to find the obtuse vertex and use the formula from the bisection theorem for angles, to find the bisector -> scrapped, using points?
         if (angle_A > 90.0) {
             // I need ab and ac
             obtuse_vertex = a;
             p_a = b;
             p_b = c;             
         } else if (angle_B > 90.0) {
-            // I need ab, bc
+            // I need ab and bc
             obtuse_vertex = b;
             p_a = a;
             p_b = c; 
@@ -246,24 +241,20 @@ void PSLG::insert_steiner_bisection(CDT *instance) {
             p_b = b;
         } else continue;    // no obtuse angle -> check next face
 
-        // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex + points 
+        // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex and points 
         length_a = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_a));
         length_b = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_b));
 
+        // Calculate ratio to find the point, using the math formula / equation with the coordinates of the points
+        // (Couldn't find the intersection using CGAL vectors)
         double ratio_a = length_a / (length_a + length_b);
         double ratio_b = length_b / (length_a + length_b);
 
-        // formula is ∥BC∥ * BA + ∥BA∥ * BC if the obtuse angle is B, for example
-        // Vector bisector = length_b * edge_a + length_a * edge_b;
-
-        // can't find intersection point with cgal vectors, so i have to find the bisection point another way
-        // use the equation to find the point, using the coordinates of the points left
         Point bisection_point {
             ratio_a * p_a.x() + ratio_b * p_b.x(),
             ratio_a * p_a.y() + ratio_b * p_b.y(),
         };
 
-        // steiner_points.push_back(bisection_point);
         insert_steiner_point(bisection_point);
     }
 
@@ -273,6 +264,7 @@ void PSLG::insert_steiner_bisection(CDT *instance) {
     }
     std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }
+
 
 bool PSLG::face_is_infinite(CDT::Face_handle face, CDT *instance) {
     for (int i = 0; i < 3; i++) {
@@ -357,25 +349,22 @@ void PSLG::flipper_not_0(CDT *cdt) {
     std::cout << "##### end of flips #####" << std::endl;
 }
 
+// Function that produces the final .json output with the data as requested
 void PSLG::produce_output() {
     pt::ptree root;
     root.put("content_type", "CG_SHOP_2025_Solution");
-    root.put("instance_uid", uid); // this must be the instance id we got from input? 
+    root.put("instance_uid", uid);
         
     // trees to insert the rest of the data
     pt::ptree steiner_points_x, steiner_points_y, edges;
 
-    // followed that one web page's example like in input, "adding a list of values"
     for (Point point : steiner_points) {
-        // need to convert to string first ? -> no, this is for fractions
-        // std::string x_string = std::to_string(point.x());
-        // std::string y_string = std::to_string(point.y());
 
-        // the ones that will be inserted
-        pt::ptree x_node, y_node;
+        pt::ptree x_node, y_node;       // different nodes for each coordinate, to make the pairs with the empty string to insert
         x_node.put("",point.x());
         y_node.put("", point.y());
 
+        // this way, the points are shown as in the input .json files
         steiner_points_x.push_back(std::make_pair("", x_node));
         steiner_points_y.push_back(std::make_pair("", y_node));
     }
@@ -390,7 +379,6 @@ void PSLG::produce_output() {
         pt::ptree p1_tree, p2_tree; // p1 and p2 are basically the positions of the two points
 
         // we need to find where the two points are in the point vector 
-        // i don't really like doing it like this, maybe find another way similar to the input one 
         auto it1 = std::find(point_vec.begin(), point_vec.end(), edge.first);
         auto it2 = std::find(point_vec.begin(), point_vec.end(), edge.second);
         int p1_pos = std::distance(point_vec.begin(), it1);
