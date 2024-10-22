@@ -76,10 +76,6 @@ void PSLG::delaunay_passer(CDT* delaunay_instance) {
     }
 }
 
-// Simply insert the point in the steiner vector 
-void PSLG::insert_steiner_point(Point point) {
-    steiner_points.push_back(point);
-}
 
 // Function to calculate angles using the dot product method. Used to check for non-obtuse triangles later.
 double PSLG::angle(Point a, Point b, Point c) {
@@ -152,6 +148,11 @@ bool PSLG::is_obtuse_gen(CDT* instance) {
     }
     std::cout << "///// obtuce triangles foud: " << number_of_obtuce << " \\\\\\\\\\" << std::endl; 
     return false;   // no obtuse triangle found in the instance
+}
+
+// Simply insert the point in the steiner vector 
+void PSLG::insert_steiner_point(Point point) {
+    steiner_points.push_back(point);
 }
 
 // Steiner point method 1 : insert in center 
