@@ -41,7 +41,7 @@ endif()
 
 # add_to_cached_list( CGAL_EXECUTABLE_TARGETS test_draw )
 
-add_executable(project  ex.cpp )
+add_executable(project  ex.cpp pslg.cpp)
 # add_executable(test_draw tests/test_draw.cpp)
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS project )
 
