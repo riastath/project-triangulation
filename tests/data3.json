@@ -1,0 +1,10 @@
+{
+    "instance_uid": "simple_polygon",
+    "num_points": 4,
+    "points_x": [100, 400, 375, 300],
+    "points_y": [100, 112, 452, 0],
+    "region_boundary": [0,1,2,3],
+    "num_constraints": 11,
+    "additional_constraints": [
+    ]
+}
