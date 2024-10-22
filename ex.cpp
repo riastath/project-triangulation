@@ -33,9 +33,9 @@ int main(void) {
     graph->is_obtuse_gen(&cdt);
     graph->flipper_not_0(&cdt);
     std::cout << "After fliping" << std::endl;
-    // graph->insert_steiner_center(&cdt);
+    graph->insert_steiner_center(&cdt);
     // graph->insert_steiner_mid(&cdt);
-    graph->insert_steiner_bisection(&cdt);
+    // graph->insert_steiner_bisection(&cdt);
     graph->is_obtuse_gen(&cdt);
     CGAL::draw(cdt);
 

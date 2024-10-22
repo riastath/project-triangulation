@@ -116,7 +116,7 @@ bool PSLG::is_obtuse(Point a, Point b, Point c) {
 // Version 2 of the obtuse checking function, to check for the actual triangulation (not just a triangle given)
 bool PSLG::is_obtuse_gen(CDT* instance) {
     int number_of_obtuce = 0;
-    CDT::Finite_faces_iterator it;  // initialize iterator
+    CDT::Finite_faces_iterator it;
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
         // we need to examine every vertex using the iterator, and find the 3 points of each triangle
         // these examine the 1st, 2nd and 3rd vertex respectively.
@@ -126,19 +126,9 @@ bool PSLG::is_obtuse_gen(CDT* instance) {
         Point b = it->vertex(1)->point();
         Point c = it->vertex(2)->point();
 
-        // std::cout << "Points of the current triangle :" << std::endl;
-        // std::cout << a << std::endl;
-        // std::cout << b << std::endl;
-        // std::cout << c << std::endl;
-
         double angle_A = angle(a, b, c);
         double angle_B = angle(b, a, c);
         double angle_C = angle(c, a, b);
-
-        // std::cout << "Angles of the current triangle :" << std::endl;
-        // std:: cout << angle_A << std::endl;
-        // std::cout << angle_B << std::endl;
-        // std::cout << angle_C << std:: endl;
 
         if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
             // return true;    // an obtuse triangle is found in the instance
@@ -402,7 +392,7 @@ void PSLG::produce_output() {
     for (Point point : steiner_points) {
 
         pt::ptree x_node, y_node;       // different nodes for each coordinate, to make the pairs with the empty string to insert
-        x_node.put("",point.x());
+        x_node.put("", point.x());
         y_node.put("", point.y());
 
         // this way, the points are shown as in the input .json files
@@ -435,5 +425,5 @@ void PSLG::produce_output() {
 
     root.add_child("edges", edges);
 
-    write_json(std::cout, root);    // with this, we print the output (can also redirect to an output file)
+    write_json("output.json", root);    // redirect output to a file 
 }
