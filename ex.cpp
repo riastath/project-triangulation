@@ -1,4 +1,4 @@
-#include "pslg.h"
+#include "pslg.hpp"
 
 int main(void) {
     std::string filename = "tests/data.json";

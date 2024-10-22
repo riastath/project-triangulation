@@ -1,4 +1,4 @@
-#include "pslg.h"
+#include "pslg.hpp"
 
 // Constructor
 PSLG::PSLG(std::string filename) {
@@ -156,7 +156,7 @@ void PSLG::insert_steiner_point(Point point) {
 }
 
 // Steiner point method 1 : insert in center 
-void insert_steiner_center(CDT *instance) {
+void PSLG::insert_steiner_center(CDT *instance) {
     CDT::Finite_faces_iterator it;
     // std::vector<Point> steiner_points;  // to insert the steiner points
 
