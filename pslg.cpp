@@ -61,16 +61,13 @@ void PSLG::printer() {
     std::cout << std::endl;
 }
 
+// To pass all points and edges to the delaunay triangulation instance
 void PSLG::delaunay_passer(CDT* delaunay_instance) {
     // pass the points delaunay instance
     for (const Point& p: point_vec){
         delaunay_instance->insert(p);
     }
 
-    // pass modified constraints
-    // for (const auto& constraint: del_constr) {
-    //     delaunay_instance->insert_constraint(point_vec[constraint.first], point_vec[constraint.second]);
-    // }
     for (const auto& constraint: additional_constraints) {
         delaunay_instance->insert_constraint(constraint.first, constraint.second);
     }
@@ -132,7 +129,7 @@ bool PSLG::is_obtuse_gen(CDT* instance) {
 
         if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
             // return true;    // an obtuse triangle is found in the instance
-            std::cout << "found" << std::endl;  // to test
+            // std::cout << "found" << std::endl;  // to test
             number_of_obtuce++;
         }
     }
@@ -149,10 +146,6 @@ void PSLG::insert_steiner_point(Point point) {
 void PSLG::insert_steiner_center(CDT *instance) {
     CDT::Finite_faces_iterator it;
     // std::vector<Point> steiner_points;  // to insert the steiner points
-
-    // if (angle(fh->vertex(j)->point(), fh->vertex((j+1)%3)->point(), fh->vertex((j+2)%3)->point()) <= 90) {
-                // continue;
-            // }
 
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
         // std::cout << "entered loop" << std::endl;
@@ -296,88 +289,83 @@ void PSLG::insert_steiner_bisection(CDT *instance) {
     std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }
 
-
+// Check if a triangle is infinite (through face handle)
 bool PSLG::face_is_infinite(CDT::Face_handle face, CDT *instance) {
     for (int i = 0; i < 3; i++) {
-        // std::cout << face->vertex(i)->point() << std::endl;
+        // if a triangle includes atleast one infinite vertex, then it is infinite
         if (face->vertex(i) == instance->infinite_vertex()) {
-            // std::cout << "hello?" << std::endl;
             return true;
         }
     }
     return false;
 }
 
-void PSLG::flipper_not_0(CDT *cdt) {
+void PSLG::flip_edges(CDT *cdt) {
+    // faces that initiated a flip
     std::vector<std::pair<CDT::Face_handle, int>> flip_vec; 
+    // faces that were fliped by another face
     std::vector<CDT::Face_handle> fliped_neighbors;
-    // std::pair<Point, Point> constr = std::make_pair(point_vec.at(graph_edge[0]), point_vec.at(graph_edge[1]));
 
     int i = 1;
     for (CDT::Face_handle fh: cdt->finite_face_handles()) {
 
-        // std::cout << "face " << i << " has neighbors: " << std::endl;
-        // for (int j = 0; j < 3; j++) {
-        //     std::string res = face_is_infinite(fh->neighbor(j), &cdt) ? "invalid" : "valid";
-        //     std::cout << j << ": " << res << std::endl;
-        // }
         for (int j = 0; j < 3; j++) {
-            // check if neighbor exists to flip
-                
+            
+            // flip only if obtuce angle exists    
             if (!is_obtuse(fh->vertex(j)->point(), fh->vertex((j+1)%3)->point(), fh->vertex((j+2)%3)->point())) {
                 continue;
             }
 
+            // check if neighbor exists to flip
             if (face_is_infinite(fh->neighbor(j), cdt)){
                 continue;
             }
                 
-            // has the face been in a flip
+            // check if the face has been involved in a flip
             auto it = find(fliped_neighbors.begin(), fliped_neighbors.end(), fh);
             if (it != fliped_neighbors.end()) {
-                std::cout << "face handle allready in vector" << std::endl;
+                // std::cout << "face handle allready in vector" << std::endl;
                 continue;
             }
 
-            // has the neighbor initiated a flip
+            // check if the neighbor has initiated a flip
             CDT::Face_handle key = fh->neighbor(j);
             auto it2 = find_if(flip_vec.begin(), flip_vec.end(),[key](const auto& p) { return p.first == key; });
             if (it2 != flip_vec.end()) {
-                std::cout << "neighbor face handle allready in vector" << std::endl;
+                // std::cout << "neighbor face handle allready in vector" << std::endl;
                 continue;
             }
 
-            // has the neighbor been in a flip
+            // check if the neighbor has been involved in a flip
             auto it3 = find(fliped_neighbors.begin(), fliped_neighbors.end(), fh->neighbor(j));
             if (it3 != fliped_neighbors.end()) {
-                std::cout << "neighbor face handle has been fliped" << std::endl;
+                // std::cout << "neighbor face handle has been fliped" << std::endl;
                 continue;
             }
 
-            // CDT::Face_handle key = fh->neighbor(j);
-            // auto it = find_if(flip_vec.begin(), flip_vec.end(),[key](const auto& p) { return p.first == key; });
-            // if (it != flip_vec.end()) {
-            //     std::cout << "neighbor face handle allready in vector" << std::endl;
-            //     continue;
-            // }
-
+            // insert faces to apropriate vectors
             std::pair<CDT::Face_handle, int> flip_item = std::make_pair(fh, j);
             flip_vec.push_back(flip_item);
             fliped_neighbors.push_back(fh->neighbor(j));
         }
-        // std::cout << "### end ###" << std::endl;
+
     }
 
-    std::cout << "to flip:" << flip_vec.size() << std::endl;
+    // std::cout << "to flip:" << flip_vec.size() << std::endl;
     for (int i = 0; i < flip_vec.size(); i++) {
-        std::cout << "flip" << std::endl;
+        // std::cout << "flip" << std::endl;
         std::pair<CDT::Face_handle, int> flip_item = flip_vec.at(i);
-        std::cout << flip_item.first->vertex(0)->point() << "  " 
-        << flip_item.first->vertex(1)->point() << "  " 
-        << flip_item.first->vertex(2)->point() << std::endl;
+        // std::cout << flip_item.first->vertex(0)->point() << "  " 
+        // << flip_item.first->vertex(1)->point() << "  " 
+        // << flip_item.first->vertex(2)->point() << std::endl;
+        // std::cout << flip_item.first->neighbor(flip_item.second)->vertex(0)->point() << " "
+        // << flip_item.first->neighbor(flip_item.second)->vertex(1)->point() << " "
+        // << flip_item.first->neighbor(flip_item.second)->vertex(2)->point() << " " << std::endl;
         cdt->flip(flip_item.first, flip_item.second);
     }
-    std::cout << "##### end of flips #####" << std::endl;
+    
+    std::cout << "Edges fliped are: " << flip_vec.size() << std::endl;
+    // std::cout << "##### end of flips #####" << std::endl;
 }
 
 // Function that produces the final .json output with the data as requested

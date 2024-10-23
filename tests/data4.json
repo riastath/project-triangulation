@@ -1,0 +1,10 @@
+{
+    "instance_uid": "quad_polygon",
+    "num_points": 4,
+    "points_x": [47, 378, 433, 1640, 989],
+    "points_y": [300, 1329, 885, 512, 76],
+    "region_boundary": [0,1,3,4],
+    "num_constraints": 4,
+    "additional_constraints": [[0,1] , [1,3], [3,4], [4,0]
+    ]
+}

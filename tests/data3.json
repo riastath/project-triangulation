@@ -1,5 +1,5 @@
 {
-    "instance_uid": "simple_polygon",
+    "instance_uid": "advanced_double_triangle",
     "num_points": 4,
     "points_x": [100, 400, 375, 300],
     "points_y": [100, 112, 452, 0],

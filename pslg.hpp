@@ -54,7 +54,7 @@ public:
     void insert_steiner_projection(CDT *instance);
 
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);
-    void flipper_not_0(CDT *cdt);
+    void flip_edges(CDT *cdt);
 
     void produce_output();
 };

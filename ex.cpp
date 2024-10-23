@@ -1,7 +1,76 @@
 #include "pslg.hpp"
+#include <fstream>
+#include <iostream>
 
-int main(void) {
+enum action {
+    none,
+    flip,
+    center_point,
+    mid_point,
+    bisector_point
+};
+
+void argument_handler(int argc, char* argv[], enum action* actions, std::string*filename) {
+    int a = 0;
+    for (int i = 1;  i < argc; i++) {
+        if (argv[i][0] != '-') {
+            continue;
+        }
+        if (argv[i][1] == 'i') { // get filename
+            if (i+1 == argc) {
+                std::cout << "filename not given, reverting to default" << std::endl;
+                return;
+            }
+            if (argv[i+1][0] == '-') {
+                std::cout << "filename not given, reverting to default" << std::endl;
+                return;
+            }
+            *filename = argv[i+1];
+            continue;
+        }
+        switch (argv[i][1]) {
+            case 'f':
+                actions[a] = flip;
+                a++;
+                break;
+            case 'c':
+                actions[a] = center_point;
+                a++;
+                break;
+            case 'm':
+                actions[a] = mid_point;
+                a++;
+                break;
+            case 'b':
+                actions[a] = bisector_point;
+                a++;
+                break;
+            default: 
+                std::cout << "unrecognized command: " << argv[i] << std::endl;
+                break;
+        }
+    }
+}
+
+int main(int  argc, char *argv[]) {
     std::string filename = "tests/data.json";
+    
+    enum action actions[10];
+    for (int i = 0; i < 10; i++) {
+        actions[i] = none;
+    }
+
+    argument_handler(argc, argv, actions, &filename);
+
+    // std::cout << "filename is: " << filename << std::endl;
+    FILE* file = fopen(filename.c_str(), "r");
+    if (file == NULL) {
+        std::cout << "file not found, ending program" << std::endl;
+        return 0;
+    }
+    fclose(file);
+    
+
     PSLG * graph = new PSLG(filename);
     graph->printer();
 
@@ -29,14 +98,50 @@ int main(void) {
     // graph->insert_steiner_bisection(&cdt);
     // graph->is_obtuse_gen(&cdt);
 
-    std::cout << "Before fliping" << std::endl;
+    std::cout << std::endl;
+    std::cout << "Before processing:" << std::endl;
     graph->is_obtuse_gen(&cdt);
-    graph->flipper_not_0(&cdt);
-    std::cout << "After fliping" << std::endl;
-    graph->insert_steiner_center(&cdt);
+    std::cout << std::endl;
+
+    int a = 0;
+    while (actions[a] != none) {
+        switch(actions[a]){
+            case flip:
+                // std::cout << "flip" << std::endl;
+                graph->flip_edges(&cdt);
+                break;
+            case center_point:
+                // std::cout << "center" << std::endl;
+                graph->insert_steiner_center(&cdt);
+                break;
+            case mid_point:
+                // std::cout << "midpoint" << std::endl;
+                graph->insert_steiner_mid(&cdt);
+                break;
+            case bisector_point:
+                // std::cout << "bisector" << std::endl;
+                graph->insert_steiner_bisection(&cdt);
+                break;
+        }
+        a++;
+    }
+
+
+    // graph->flip_edges(&cdt);
+    // graph->insert_steiner_center(&cdt);
     // graph->insert_steiner_mid(&cdt);
     // graph->insert_steiner_bisection(&cdt);
+
+    std::cout << std::endl;
+    std::cout << "After processing:" << std::endl;
     graph->is_obtuse_gen(&cdt);
+    std::cout << std::endl;
+
+    // for (CDT::Face_handle fh: cdt.finite_face_handles()) {
+    //     std::cout << "face:" << std::endl;
+    //     std::cout << fh->vertex(0)->point() << " " << fh->vertex(1)->point() << " " << fh->vertex(2)->point() << std::endl;
+    // }
+
     CGAL::draw(cdt);
 
     // -- Starting here, testing for the output json using property tree -- //
