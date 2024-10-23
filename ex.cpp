@@ -161,3 +161,6 @@ int main(int  argc, char *argv[]) {
 
     return 0;
 }
+
+
+// for looping : have an iteration limit and flag for obtuse's existence, so as long as there's an obtuse left, keep looping
