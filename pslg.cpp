@@ -127,6 +127,10 @@ bool PSLG::is_obtuse_gen(CDT* instance) {
         double angle_B = angle(b, a, c);
         double angle_C = angle(c, a, b);
 
+        if (angle_A >= 180.0 || angle_B >= 180.0 || angle_C >= 180.0) {
+            continue;
+        }
+
         if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
             // return true;    // an obtuse triangle is found in the instance
             // std::cout << "found" << std::endl;  // to test
@@ -317,14 +321,41 @@ void PSLG::insert_steiner_projection(CDT *instance) {
             std::cout << "point1: " << p1 << std::endl;
             std::cout << "point2: " << p2 << std::endl;
 
-            double slope = (p2.y() - p1.y())/(p2.x() - p1.x());
-            double slope_per = -1/slope;
+            // line is: y=b, and per_line is: x=b_per.
+            double mult = 0.000000001;
+            int dirx = 1;
+            int diry = 1;
+            double x,y;
+            if (p2.x() == p1.x()) {
+                x = p1.x();
+                y = p0.y();
+            }
+            else if (p2.y() == p1.y()) {
+                x = p0.x();
+                y = p1.y();
+            }
+            else {
+                double slope = (p2.y() - p1.y())/(p2.x() - p1.x());
+                double slope_per = -1/slope;
 
-            double b = p1.y() - slope * p1.x();
-            double b_per = p0.y() - slope_per * p0.x();
+                double b = p1.y() - slope * p1.x();
+                double b_per = p0.y() - slope_per * p0.x();
 
-            double x = (b_per - b) / (slope - slope_per);
-            double y = slope_per * x + b_per;
+                x = (b_per - b) / (slope - slope_per);
+                y = slope_per * x + b_per;
+
+                // modifying points (extend slightly outwards to negate infinitly small faces)
+                dirx = (x - p0.x()) / abs(x - p0.x());
+                diry = (y - p0.y()) / abs(y - p0.y());
+                std::cout << "dirs: " << dirx << " , " << diry << std::endl;
+                std::cout << "before: " << x << " , " << y << std::endl;
+
+                x += dirx * 1 * mult;
+                y += diry * dirx * slope_per * mult;
+                std::cout << "after: " << x << " , " << y << std::endl;
+            }
+
+            
             
             Point projection_point = {x,y};
             std::cout << "point is: " << x << ", " << y << std::endl;

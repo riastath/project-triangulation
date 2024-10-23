@@ -145,10 +145,14 @@ int main(int  argc, char *argv[]) {
     graph->is_obtuse_gen(&cdt);
     std::cout << std::endl;
 
+    // int faxes = 0;
     // for (CDT::Face_handle fh: cdt.finite_face_handles()) {
     //     std::cout << "face:" << std::endl;
+    //     std::cout << "validity: " << fh->is_valid() << std::endl;  
     //     std::cout << fh->vertex(0)->point() << " " << fh->vertex(1)->point() << " " << fh->vertex(2)->point() << std::endl;
+    //     faxes++;
     // }
+    // std::cout << "num of faces: " << faxes << std::endl;
 
     CGAL::draw(cdt);
 
