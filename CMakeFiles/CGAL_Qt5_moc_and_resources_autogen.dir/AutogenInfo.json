@@ -1,16 +1,16 @@
 {
-	"BUILD_DIR" : "/home/gpnb/project1/CGAL_Qt5_moc_and_resources_autogen",
-	"CMAKE_BINARY_DIR" : "/home/gpnb/project1",
-	"CMAKE_CURRENT_BINARY_DIR" : "/home/gpnb/project1",
-	"CMAKE_CURRENT_SOURCE_DIR" : "/home/gpnb/project1",
+	"BUILD_DIR" : "/home/maria/project1/CGAL_Qt5_moc_and_resources_autogen",
+	"CMAKE_BINARY_DIR" : "/home/maria/project1",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/maria/project1",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/maria/project1",
 	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
 	"CMAKE_LIST_FILES" : 
 	[
-		"/home/gpnb/project1/CMakeLists.txt",
-		"/home/gpnb/project1/CMakeFiles/3.22.1/CMakeSystem.cmake",
+		"/home/maria/project1/CMakeLists.txt",
+		"/home/maria/project1/CMakeFiles/3.22.1/CMakeSystem.cmake",
 		"/usr/share/cmake-3.22/Modules/CMakeSystemSpecificInitialize.cmake",
-		"/home/gpnb/project1/CMakeFiles/3.22.1/CMakeCCompiler.cmake",
-		"/home/gpnb/project1/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake",
+		"/home/maria/project1/CMakeFiles/3.22.1/CMakeCCompiler.cmake",
+		"/home/maria/project1/CMakeFiles/3.22.1/CMakeCXXCompiler.cmake",
 		"/usr/share/cmake-3.22/Modules/CMakeSystemSpecificInformation.cmake",
 		"/usr/share/cmake-3.22/Modules/CMakeGenericSystem.cmake",
 		"/usr/share/cmake-3.22/Modules/CMakeInitializeConfigs.cmake",
@@ -121,10 +121,10 @@
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
 		"/usr/local/lib/cmake/CGAL/CGAL_Qt5_moc_and_resource_files.cmake",
-		"/home/gpnb/project1/resources/CGAL.qrc",
-		"/home/gpnb/project1/icons/Input.qrc",
-		"/home/gpnb/project1/icons/File.qrc",
-		"/home/gpnb/project1/icons/Triangulation_2.qrc",
+		"/home/maria/project1/resources/CGAL.qrc",
+		"/home/maria/project1/icons/Input.qrc",
+		"/home/maria/project1/icons/File.qrc",
+		"/home/maria/project1/icons/Triangulation_2.qrc",
 		"/usr/local/lib/cmake/CGAL/CGAL_setup_target_dependencies.cmake",
 		"/usr/share/cmake-3.22/Modules/FindThreads.cmake",
 		"/usr/share/cmake-3.22/Modules/CheckLibraryExists.cmake",
@@ -141,7 +141,7 @@
 		"/usr/lib/x86_64-linux-gnu/cmake/boost_headers-1.74.0/boost_headers-config-version.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/boost_headers-1.74.0/boost_headers-config.cmake"
 	],
-	"CMAKE_SOURCE_DIR" : "/home/gpnb/project1",
+	"CMAKE_SOURCE_DIR" : "/home/maria/project1",
 	"DEP_FILE" : "",
 	"DEP_FILE_RULE_NAME" : "",
 	"HEADERS" : 
@@ -214,8 +214,8 @@
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
-	"INCLUDE_DIR" : "/home/gpnb/project1/CGAL_Qt5_moc_and_resources_autogen/include",
-	"MOC_COMPILATION_FILE" : "/home/gpnb/project1/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp",
+	"INCLUDE_DIR" : "/home/maria/project1/CGAL_Qt5_moc_and_resources_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/maria/project1/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
 		"BOOST_ALL_NO_LIB",
@@ -236,7 +236,7 @@
 	],
 	"MOC_INCLUDES" : 
 	[
-		"/home/gpnb/project1",
+		"/home/maria/project1",
 		"/usr/include/x86_64-linux-gnu/qt5",
 		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
 		"/usr/include/x86_64-linux-gnu/qt5/QtGui",
@@ -262,24 +262,24 @@
 		"-c",
 		"/usr/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp"
 	],
-	"MOC_PREDEFS_FILE" : "/home/gpnb/project1/CGAL_Qt5_moc_and_resources_autogen/moc_predefs.h",
+	"MOC_PREDEFS_FILE" : "/home/maria/project1/CGAL_Qt5_moc_and_resources_autogen/moc_predefs.h",
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : 
 	[
-		"/home/gpnb/project1/qrc_CGAL.cpp",
-		"/home/gpnb/project1/qrc_File.cpp",
-		"/home/gpnb/project1/qrc_Input.cpp",
-		"/home/gpnb/project1/qrc_Triangulation_2.cpp",
-		"/home/gpnb/project1/ui_ImageInterface.h"
+		"/home/maria/project1/qrc_CGAL.cpp",
+		"/home/maria/project1/qrc_File.cpp",
+		"/home/maria/project1/qrc_Input.cpp",
+		"/home/maria/project1/qrc_Triangulation_2.cpp",
+		"/home/maria/project1/ui_ImageInterface.h"
 	],
 	"MULTI_CONFIG" : false,
-	"PARALLEL" : 4,
-	"PARSE_CACHE_FILE" : "/home/gpnb/project1/CMakeFiles/CGAL_Qt5_moc_and_resources_autogen.dir/ParseCache.txt",
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/home/maria/project1/CMakeFiles/CGAL_Qt5_moc_and_resources_autogen.dir/ParseCache.txt",
 	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
 	"QT_UIC_EXECUTABLE" : "",
 	"QT_VERSION_MAJOR" : 5,
 	"QT_VERSION_MINOR" : 15,
-	"SETTINGS_FILE" : "/home/gpnb/project1/CMakeFiles/CGAL_Qt5_moc_and_resources_autogen.dir/AutogenUsed.txt",
+	"SETTINGS_FILE" : "/home/maria/project1/CMakeFiles/CGAL_Qt5_moc_and_resources_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : [],
 	"VERBOSITY" : 0
 }

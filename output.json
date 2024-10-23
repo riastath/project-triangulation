@@ -1,15 +1,7 @@
 {
     "content_type": "CG_SHOP_2025_Solution",
-    "instance_uid": "advanced_double_triangle",
-    "steiner_points_x": [
-        "293.75",
-        "387.5",
-        "237.5"
-    ],
-    "steiner_points_y": [
-        "166",
-        "282",
-        "276"
-    ],
+    "instance_uid": "simple_polygon",
+    "steiner_points_x": "",
+    "steiner_points_y": "",
     "edges": ""
 }

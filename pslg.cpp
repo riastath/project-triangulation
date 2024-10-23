@@ -289,6 +289,29 @@ void PSLG::insert_steiner_bisection(CDT *instance) {
     std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }
 
+void PSLG::insert_steiner_projection(CDT *instance) {
+    CDT::Finite_faces_iterator it;
+
+    for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
+        Point a = it->vertex(0)->point();
+        Point b = it->vertex(1)->point();
+        Point c = it->vertex(2)->point();
+
+        double angle_A = angle(a, b, c);
+        double angle_B = angle(b, a, c);
+        double angle_C = angle(c, a, b);
+
+        
+
+
+    }
+
+
+
+
+
+}
+
 // Check if a triangle is infinite (through face handle)
 bool PSLG::face_is_infinite(CDT::Face_handle face, CDT *instance) {
     for (int i = 0; i < 3; i++) {
