@@ -7,7 +7,8 @@ enum action {
     flip,
     center_point,
     mid_point,
-    bisector_point
+    bisector_point,
+    projection_point
 };
 
 void argument_handler(int argc, char* argv[], enum action* actions, std::string*filename) {
@@ -43,6 +44,10 @@ void argument_handler(int argc, char* argv[], enum action* actions, std::string*
                 break;
             case 'b':
                 actions[a] = bisector_point;
+                a++;
+                break;
+            case 'p':
+                actions[a] = projection_point;
                 a++;
                 break;
             default: 
@@ -121,6 +126,9 @@ int main(int  argc, char *argv[]) {
             case bisector_point:
                 // std::cout << "bisector" << std::endl;
                 graph->insert_steiner_bisection(&cdt);
+                break;
+            case projection_point:
+                graph->insert_steiner_projection(&cdt);
                 break;
         }
         a++;

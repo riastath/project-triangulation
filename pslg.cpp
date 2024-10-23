@@ -130,6 +130,10 @@ bool PSLG::is_obtuse_gen(CDT* instance) {
         if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
             // return true;    // an obtuse triangle is found in the instance
             // std::cout << "found" << std::endl;  // to test
+            std::cout << "points of obtuce:" << std::endl;
+            std::cout << a << " " << angle_A << std::endl;
+            std::cout << b << " " << angle_B << std::endl;
+            std::cout << c << " " << angle_C << std::endl; 
             number_of_obtuce++;
         }
     }
@@ -293,23 +297,46 @@ void PSLG::insert_steiner_projection(CDT *instance) {
     CDT::Finite_faces_iterator it;
 
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
-        Point a = it->vertex(0)->point();
-        Point b = it->vertex(1)->point();
-        Point c = it->vertex(2)->point();
+        // Point a = it->vertex(0)->point();
+        // Point b = it->vertex(1)->point();
+        // Point c = it->vertex(2)->point();
 
-        double angle_A = angle(a, b, c);
-        double angle_B = angle(b, a, c);
-        double angle_C = angle(c, a, b);
+        // double angle_A = angle(a, b, c);
+        // double angle_B = angle(b, a, c);
+        // double angle_C = angle(c, a, b);
+        for (int j = 0; j < 3; j++) {
+            Point p0 = it->vertex(j)->point();
+            Point p1 = it->vertex((j+1)%3)->point();
+            Point p2 = it->vertex((j+2)%3)->point();
 
-        
+            if (angle(p0,p1,p2) <= 90) {
+                continue;
+            }
 
+            std::cout << "point0: " << p0 << std::endl;
+            std::cout << "point1: " << p1 << std::endl;
+            std::cout << "point2: " << p2 << std::endl;
 
+            double slope = (p2.y() - p1.y())/(p2.x() - p1.x());
+            double slope_per = -1/slope;
+
+            double b = p1.y() - slope * p1.x();
+            double b_per = p0.y() - slope_per * p0.x();
+
+            double x = (b_per - b) / (slope - slope_per);
+            double y = slope_per * x + b_per;
+            
+            Point projection_point = {x,y};
+            std::cout << "point is: " << x << ", " << y << std::endl;
+            insert_steiner_point(projection_point);
+            std::cout << "point inserted" << std::endl;
+        }
+    
     }
-
-
-
-
-
+    for (const Point& p: steiner_points) {
+        instance->insert(p);
+    }
+    std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }
 
 // Check if a triangle is infinite (through face handle)
