@@ -165,6 +165,7 @@ std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle
     Point c = face->vertex((i+2)%3)->point();
 
     Point center = CGAL::centroid(a, b, c, extra);
+    insert_all_steiner(&instance);
     instance.insert(center);
     int num_after = is_obtuse_gen(&instance);
 
@@ -184,6 +185,7 @@ std::pair<Point, int> PSLG::insert_steiner_mid(CDT instance, CDT::Face_handle fa
     double angle_B = angle(b, a, c);
     double angle_C = angle(c, a, b);
 
+    insert_all_steiner(&instance);
     if (angle_A > 90.0) {
         mid = CGAL::midpoint(b, c);
         instance.insert(mid);
@@ -249,7 +251,7 @@ std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_han
         ratio_a * p_a.x() + ratio_b * p_b.x(),
         ratio_a * p_a.y() + ratio_b * p_b.y(),
     };
-
+    insert_all_steiner(&instance);
     instance.insert(bisection_point);
     int num_after = is_obtuse_gen(&instance);
 
@@ -342,6 +344,7 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
         return std::make_pair(Point(NAN,NAN), -1);
     }
 
+    insert_all_steiner(&instance);
     instance.insert(projection_point);
     int num_after = is_obtuse_gen(&instance);
 

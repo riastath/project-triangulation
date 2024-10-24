@@ -12,58 +12,74 @@ enum action {
 };
 
 void test(PSLG *graph, CDT *cdt) {
-    CDT::Finite_faces_iterator it;
-    int num_obtuse = graph->is_obtuse_gen(cdt);
-    int max_improvement = -1;
-    std::pair<Point, int> max_pair;
-    std::pair<Point, int> result;
+    while (true) {
+        int inserted = 0;
+        CDT::Finite_faces_iterator it;
+        int num_obtuse = graph->is_obtuse_gen(cdt);
+        int max_improvement = -1;
+        std::pair<Point, int> max_pair;
+        std::pair<Point, int> result;
 
-    for (it = cdt->finite_faces_begin(); it != cdt->finite_faces_end(); it++) {
-        max_improvement = -1;
+        for (it = cdt->finite_faces_begin(); it != cdt->finite_faces_end(); it++) {
+            max_improvement = -1;
 
-        result = graph->insert_steiner_center(*cdt, it, num_obtuse);
-        std::cout << "centroid is" << result.first << std::endl;
-        std::cout << "improvement is" << result.second << std::endl;
-        if (max_improvement < result.second) {
-            max_improvement = result.second;
-            max_pair = result;
+            result = graph->insert_steiner_center(*cdt, it, num_obtuse);
+            std::cout << "centroid is" << result.first << std::endl;
+            std::cout << "improvement is" << result.second << std::endl;
+            if (max_improvement < result.second) {
+                max_improvement = result.second;
+                max_pair = result;
+            }
+
+            result = graph->insert_steiner_mid(*cdt, it, num_obtuse);
+            std::cout << "midpoint is" << result.first << std::endl;
+            std::cout << "improvement is" << result.second << std::endl;
+            if (max_improvement < result.second) {
+                max_improvement = result.second;
+                max_pair = result;
+            }
+
+            result = graph->insert_steiner_bisection(*cdt, it, num_obtuse);
+            std::cout << "bisection point is" << result.first << std::endl;
+            std::cout << "improvement is" << result.second << std::endl;
+            if (max_improvement < result.second) {
+                max_improvement = result.second;
+                max_pair = result;
+            }
+
+        
+            result = graph->insert_steiner_projection(*cdt, it, num_obtuse);
+            std::cout << "projection point is" << result.first << std::endl;
+            std::cout << "improvement is" << result.second << std::endl;
+            if (max_improvement < result.second) {
+                max_improvement = result.second;
+                max_pair = result;
+            }
+
+
+            std::cout << "improvement is currently !!!!!!!!!!!!!! " << max_improvement << std::endl;
+            if (max_improvement < 0) {
+                continue;
+            }
+            std::cout << "point to insert is !!!!!!!!!!!! " << result.first << std::endl;
+            graph->insert_steiner_point(max_pair.first);
+            inserted++;
+        } 
+        std::cout << "inserting : " << inserted << std::endl;
+        if (inserted <= 0) {
+            std::cout << "no change hapening, exiting" << std::endl;
+            break;
         }
+        graph->insert_all_steiner(cdt);
+        std::cout << " ----------  inserted ------------- " << std::endl;
 
-        result = graph->insert_steiner_mid(*cdt, it, num_obtuse);
-        std::cout << "midpoint is" << result.first << std::endl;
-        std::cout << "improvement is" << result.second << std::endl;
-        if (max_improvement < result.second) {
-            max_improvement = result.second;
-            max_pair = result;
-        }
-
-        result = graph->insert_steiner_bisection(*cdt, it, num_obtuse);
-        std::cout << "bisection point is" << result.first << std::endl;
-        std::cout << "improvement is" << result.second << std::endl;
-        if (max_improvement < result.second) {
-            max_improvement = result.second;
-            max_pair = result;
-        }
-
-    
-        result = graph->insert_steiner_projection(*cdt, it, num_obtuse);
-        std::cout << "projection point is" << result.first << std::endl;
-        std::cout << "improvement is" << result.second << std::endl;
-        if (max_improvement < result.second) {
-            max_improvement = result.second;
-            max_pair = result;
-        }
-
-
-        std::cout << "improvement is currently !!!!!!!!!!!!!! " << max_improvement << std::endl;
-        if (max_improvement < 0) {
-            continue;
-        }
-        std::cout << "point to insert is !!!!!!!!!!!! " << result.first << std::endl;
-        graph->insert_steiner_point(max_pair.first);
+        std::cout << "final num of obtuce: " << graph->is_obtuse_gen(cdt) << std::endl;
+        // int test = 0;
+        // std::cin >> test;
+        // if (test== -1) {
+        //     break;
+        // }
     }
-    graph->insert_all_steiner(cdt);
-    std::cout << " ----------  inserted ------------- " << std::endl;
 }
 
 
