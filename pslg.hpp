@@ -38,7 +38,6 @@ public:
     PSLG(std::string filename);         // constructor
 
     // Helper functions
-    void printer();
     void delaunay_passer(CDT* delaunay_instance);
     void produce_output();
 

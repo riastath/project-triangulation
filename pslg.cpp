@@ -41,16 +41,6 @@ PSLG::PSLG(std::string filename) {
 
 }
 
-// To print class members -> for testing
-void PSLG::printer() {
-    std::cout << "uid is: " << uid << std::endl;
-    std::cout << "bounds: " << std::endl;
-    for (int i = 0; i < bounds.size(); i++) {
-        std::cout << bounds.at(i) << " ";
-    }
-    std::cout << std::endl;
-}
-
 // To pass all points and edges to the delaunay triangulation instance
 void PSLG::delaunay_passer(CDT* delaunay_instance) {
     // pass the points delaunay instance
@@ -121,10 +111,6 @@ int PSLG::is_obtuse_gen(CDT* instance) {
         }
 
         if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
-            std::cout << "points of obtuse:" << std::endl;
-            std::cout << a << " " << angle_A << std::endl;
-            std::cout << b << " " << angle_B << std::endl;
-            std::cout << c << " " << angle_C << std::endl; 
             number_of_obtuse++;
         }
     }
@@ -257,32 +243,6 @@ std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_han
 
     int improvement = num_obtuse - num_after;
     return std::make_pair(bisection_point, improvement);
-
-
-
-
-        // double length_u = 0.0, length_v = 0.0, bisector_length = 0.0;
-
-        // // Other method : finding the bisector using the theorem + formula
-        // // u and v are the sides resulting from the obtuse vertex
-        // Vector u = p_a - obtuse_vertex;
-        // Vector v = p_b - obtuse_vertex;
-
-        // // Find the magnitudes of the vectors (lengths)
-        // length_u = std::sqrt(u.squared_length());
-        // length_v = std::sqrt(v.squared_length());
-
-        // // from formula bisector = (a + b) / |a + b| 
-        // Vector bisector = (u / length_u) + (v / length_v);  // bisector's direction
-        // bisector_length = std::sqrt(bisector.squared_length());
-        // bisector = bisector / bisector_length;  // this sum needs to be normalized 
-
-        // // Use intersection of the bisector with the opposite edge / vector, to find the point we need
-        // Vector opposite = p_b - p_a;
-        // double t = CGAL::scalar_product(bisector, u) / CGAL::scalar_product(bisector, opposite);
-
-        // Point bisection_point = p_a + t * opposite; // use the equation form
-
 }
 
 std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuse) {
@@ -298,9 +258,6 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
         if (angle(p0,p1,p2) <= 90) {
             continue;
         }
-        std::cout << "point0: " << p0 << std::endl;
-        std::cout << "point1: " << p1 << std::endl;
-        std::cout << "point2: " << p2 << std::endl;
 
         // line is: y=b, and per_line is: x=b_per.
         double mult = 0.000000001; // offset because cgal is cgal
@@ -328,12 +285,9 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
             // modifying points (extend slightly outwards to negate infinitly small faces)
             dirx = (x - p0.x()) / abs(x - p0.x());
             diry = (y - p0.y()) / abs(y - p0.y());
-            std::cout << "dirs: " << dirx << " , " << diry << std::endl;
-            std::cout << "before: " << x << " , " << y << std::endl;
 
             x += dirx * 1 * mult;
             y += diry * abs(slope_per) * mult;
-            std::cout << "after: " << x << " , " << y << std::endl;
         }
 
         projection_point = {x,y};
@@ -395,7 +349,6 @@ void PSLG::flip_edges(CDT *cdt) {
             // check if the face has been involved in a flip
             auto it = find(fliped_neighbors.begin(), fliped_neighbors.end(), fh);
             if (it != fliped_neighbors.end()) {
-                // std::cout << "face handle allready in vector" << std::endl;
                 continue;
             }
 
@@ -403,14 +356,12 @@ void PSLG::flip_edges(CDT *cdt) {
             CDT::Face_handle key = fh->neighbor(j);
             auto it2 = find_if(flip_vec.begin(), flip_vec.end(),[key](const auto& p) { return p.first == key; });
             if (it2 != flip_vec.end()) {
-                // std::cout << "neighbor face handle allready in vector" << std::endl;
                 continue;
             }
 
             // check if the neighbor has been involved in a flip
             auto it3 = find(fliped_neighbors.begin(), fliped_neighbors.end(), fh->neighbor(j));
             if (it3 != fliped_neighbors.end()) {
-                // std::cout << "neighbor face handle has been fliped" << std::endl;
                 continue;
             }
 
@@ -422,21 +373,12 @@ void PSLG::flip_edges(CDT *cdt) {
 
     }
 
-    // std::cout << "to flip:" << flip_vec.size() << std::endl;
     for (int i = 0; i < flip_vec.size(); i++) {
-        // std::cout << "flip" << std::endl;
         std::pair<CDT::Face_handle, int> flip_item = flip_vec.at(i);
-        // std::cout << flip_item.first->vertex(0)->point() << "  " 
-        // << flip_item.first->vertex(1)->point() << "  " 
-        // << flip_item.first->vertex(2)->point() << std::endl;
-        // std::cout << flip_item.first->neighbor(flip_item.second)->vertex(0)->point() << " "
-        // << flip_item.first->neighbor(flip_item.second)->vertex(1)->point() << " "
-        // << flip_item.first->neighbor(flip_item.second)->vertex(2)->point() << " " << std::endl;
         cdt->flip(flip_item.first, flip_item.second);
     }
     
     std::cout << "Edges fliped are: " << flip_vec.size() << std::endl;
-    // std::cout << "##### end of flips #####" << std::endl;
 }
 
 // Function that produces the final .json output with the data as requested

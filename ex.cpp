@@ -24,24 +24,18 @@ void test(PSLG *graph, CDT *cdt) {
             max_improvement = -1;
 
             result = graph->insert_steiner_center(*cdt, it, num_obtuse);
-            std::cout << "centroid is" << result.first << std::endl;
-            std::cout << "improvement is" << result.second << std::endl;
             if (max_improvement < result.second) {
                 max_improvement = result.second;
                 max_pair = result;
             }
 
             result = graph->insert_steiner_mid(*cdt, it, num_obtuse);
-            std::cout << "midpoint is" << result.first << std::endl;
-            std::cout << "improvement is" << result.second << std::endl;
             if (max_improvement < result.second) {
                 max_improvement = result.second;
                 max_pair = result;
             }
 
             result = graph->insert_steiner_bisection(*cdt, it, num_obtuse);
-            std::cout << "bisection point is" << result.first << std::endl;
-            std::cout << "improvement is" << result.second << std::endl;
             if (max_improvement < result.second) {
                 max_improvement = result.second;
                 max_pair = result;
@@ -49,23 +43,20 @@ void test(PSLG *graph, CDT *cdt) {
 
         
             result = graph->insert_steiner_projection(*cdt, it, num_obtuse);
-            std::cout << "projection point is" << result.first << std::endl;
-            std::cout << "improvement is" << result.second << std::endl;
             if (max_improvement < result.second) {
                 max_improvement = result.second;
                 max_pair = result;
             }
 
-
-            std::cout << "improvement is currently !!!!!!!!!!!!!! " << max_improvement << std::endl;
             if (max_improvement < 0) {
                 continue;
             }
-            std::cout << "point to insert is !!!!!!!!!!!! " << result.first << std::endl;
+
+            std::cout << "improvement is currently !!!!!!!!!!!!!! " << max_improvement << std::endl;
             graph->insert_steiner_point(max_pair.first);
             inserted++;
         } 
-        std::cout << "inserting : " << inserted << std::endl;
+        // std::cout << "inserting : " << inserted << std::endl;
         if (inserted <= 0) {
             std::cout << "no change hapening, exiting" << std::endl;
             break;
@@ -139,7 +130,6 @@ int main(int  argc, char *argv[]) {
 
     argument_handler(argc, argv, actions, &filename);
 
-    // std::cout << "filename is: " << filename << std::endl;
     FILE* file = fopen(filename.c_str(), "r");
     if (file == NULL) {
         std::cout << "file not found, ending program" << std::endl;
@@ -149,7 +139,6 @@ int main(int  argc, char *argv[]) {
     
 
     PSLG * graph = new PSLG(filename);
-    graph->printer();
 
     CDT cdt;
     graph->delaunay_passer(&cdt);
