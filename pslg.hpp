@@ -49,11 +49,11 @@ public:
     int is_obtuse_gen(CDT* instance);
 
     void insert_steiner_point(Point point);
-    std::pair <Point, int> insert_steiner_center(CDT instance, CDT::Face_handle face, int num_obtuse);
-    void insert_steiner_mid(CDT *instance);
-    void insert_steiner_bisection(CDT *instance);
-    void insert_steiner_projection(CDT *instance);
     void insert_all_steiner(CDT *cdt);
+    std::pair <Point, int> insert_steiner_center(CDT instance, CDT::Face_handle face, int num_obtuse);
+    std::pair <Point, int> insert_steiner_mid(CDT instance, CDT::Face_handle face, int num_obtuse);
+    std::pair <Point, int> insert_steiner_bisection(CDT instance, CDT::Face_handle face, int num_obtuse);
+    void insert_steiner_projection(CDT *cdt);
 
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);
     void flip_edges(CDT *cdt);

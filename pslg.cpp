@@ -153,7 +153,6 @@ void PSLG::insert_steiner_point(Point point) {
 
 // Steiner point method 1 : insert in center 
 std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle face, int num_obtuse) {
-
     Point extra;
     int i;
     bool found = false;
@@ -182,98 +181,103 @@ std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle
     Point a = face->vertex(i)->point();
     Point b = face->vertex((i+1)%3)->point();
     Point c = face->vertex((i+2)%3)->point();
-    // std::cout << "Points: " << std::endl;
-    // std::cout << a << std::endl << b << std::endl << c << std::endl << extra << std::endl;
+
     Point center = CGAL::centroid(a, b, c, extra);
     instance.insert(center);
     int num_after = is_obtuse_gen(&instance);
-    // std::cout << "center is: " << center << std::endl;
-    // insert_steiner_point(center);
-    int improvement = num_obtuse-num_after;
+
+    int improvement = num_obtuse - num_after;
     return std::make_pair(center, improvement);
 
 }
 
 // Steiner point method 2 : insert midpoint
-void PSLG::insert_steiner_mid(CDT *instance) {
-    CDT::Finite_faces_iterator it;
+std::pair<Point, int> PSLG::insert_steiner_mid(CDT instance, CDT::Face_handle face, int num_obtuse) {
+    Point a = face->vertex(0)->point();
+    Point b = face->vertex(1)->point();
+    Point c = face->vertex(2)->point();
+    Point mid = Point(NAN, NAN);
 
-    for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
-        Point a = it->vertex(0)->point();
-        Point b = it->vertex(1)->point();
-        Point c = it->vertex(2)->point();
+    double angle_A = angle(a, b, c);
+    double angle_B = angle(b, a, c);
+    double angle_C = angle(c, a, b);
 
-        double angle_A = angle(a, b, c);
-        double angle_B = angle(b, a, c);
-        double angle_C = angle(c, a, b);
-
-        if (angle_A > 90.0) {
-            Point mid = CGAL::midpoint(b, c);
-            insert_steiner_point(mid);
-        } else if (angle_B > 90.0) {
-            Point mid = CGAL::midpoint(a, c);
-            insert_steiner_point(mid);
-
-        } else if (angle_C > 90.0) {
-            Point mid = CGAL::midpoint(a, b);
-            insert_steiner_point(mid);
-        }
+    if (angle_A > 90.0) {
+        mid = CGAL::midpoint(b, c);
+        instance.insert(mid);
+    } else if (angle_B > 90.0) {
+        mid = CGAL::midpoint(a, c);
+        instance.insert(mid);
+    } else if (angle_C > 90.0) {
+        mid = CGAL::midpoint(a, b);
+        instance.insert(mid);
+    } else {
+        return std::make_pair(Point(NAN, NAN), -1); // no obtuse angle
     }
 
-    for (const Point& p: steiner_points) {
-        instance->insert(p);
-    }
-    std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
+    int num_after = is_obtuse_gen(&instance);
+    int improvement = num_obtuse - num_after;
+
+    return std::make_pair(mid, improvement);
 }
 
 // Steiner point method 3 : insert a steiner point so that the obtuse angle is bisected
-void PSLG::insert_steiner_bisection(CDT *instance) {
-    CDT::Finite_faces_iterator it;
+std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_handle face, int num_obtuse) {
+    Point a = face->vertex(0)->point();
+    Point b = face->vertex(1)->point();
+    Point c = face->vertex(2)->point();
 
-    for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
-        Point a = it->vertex(0)->point();
-        Point b = it->vertex(1)->point();
-        Point c = it->vertex(2)->point();
+    double angle_A = angle(a, b, c);
+    double angle_B = angle(b, a, c);
+    double angle_C = angle(c, a, b);
 
-        double angle_A = angle(a, b, c);
-        double angle_B = angle(b, a, c);
-        double angle_C = angle(c, a, b);
+    Point obtuse_vertex;
+    Point p_a, p_b;
+    double length_a = 0.0, length_b = 0.0;
 
-        Point obtuse_vertex;
-        Point p_a, p_b;
+    if (angle_A > 90.0) {
+        // I need ab and ac
+        obtuse_vertex = a;
+        p_a = b;
+        p_b = c;             
+    } else if (angle_B > 90.0) {
+        // I need ab and bc
+        obtuse_vertex = b;
+        p_a = a;
+        p_b = c; 
+    } else if (angle_C > 90.0) {
+        // I need ac and bc
+        obtuse_vertex = c;
+        p_a = a;
+        p_b = b;
+    } else {
+        return std::make_pair(Point(NAN, NAN), -1);
+    }
+
+    // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex and points 
+    length_a = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_a));
+    length_b = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_b));
+
+    // Calculate ratio to find the point, using the math formula / equation with the coordinates of the points
+    // (Couldn't find the intersection using CGAL vectors)
+    double ratio_a = length_a / (length_a + length_b);
+    double ratio_b = length_b / (length_a + length_b);
+
+    Point bisection_point {
+        ratio_a * p_a.x() + ratio_b * p_b.x(),
+        ratio_a * p_a.y() + ratio_b * p_b.y(),
+    };
+
+    instance.insert(bisection_point);
+    int num_after = is_obtuse_gen(&instance);
+
+    int improvement = num_obtuse - num_after;
+    return std::make_pair(bisection_point, improvement);
+
+
+
+
         // double length_u = 0.0, length_v = 0.0, bisector_length = 0.0;
-        double length_a = 0.0, length_b = 0.0;
-
-        if (angle_A > 90.0) {
-            // I need ab and ac
-            obtuse_vertex = a;
-            p_a = b;
-            p_b = c;             
-        } else if (angle_B > 90.0) {
-            // I need ab and bc
-            obtuse_vertex = b;
-            p_a = a;
-            p_b = c; 
-        } else if (angle_C > 90.0) {
-            // I need ac and bc
-            obtuse_vertex = c;
-            p_a = a;
-            p_b = b;
-        } else continue;    // no obtuse angle -> check next face
-
-        // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex and points 
-        length_a = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_a));
-        length_b = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_b));
-
-        // Calculate ratio to find the point, using the math formula / equation with the coordinates of the points
-        // (Couldn't find the intersection using CGAL vectors)
-        double ratio_a = length_a / (length_a + length_b);
-        double ratio_b = length_b / (length_a + length_b);
-
-        Point bisection_point {
-            ratio_a * p_a.x() + ratio_b * p_b.x(),
-            ratio_a * p_a.y() + ratio_b * p_b.y(),
-        };
 
         // // Other method : finding the bisector using the theorem + formula
         // // u and v are the sides resulting from the obtuse vertex
@@ -295,14 +299,6 @@ void PSLG::insert_steiner_bisection(CDT *instance) {
 
         // Point bisection_point = p_a + t * opposite; // use the equation form
 
-        insert_steiner_point(bisection_point);
-    }
-
-    // Insert all the steiner points at the end 
-    for (const Point& p: steiner_points) {
-        instance->insert(p);
-    }
-    std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }
 
 void PSLG::insert_steiner_projection(CDT *instance) {

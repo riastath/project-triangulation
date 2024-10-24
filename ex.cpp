@@ -16,16 +16,45 @@ void test(PSLG *graph, CDT *cdt) {
     int num_obtuse = graph->is_obtuse_gen(cdt);
     int max_improvement = -1;
     std::pair<Point, int> max_pair;
+    std::pair<Point, int> result;
 
     for (it = cdt->finite_faces_begin(); it != cdt->finite_faces_end(); it++) {
         max_improvement = -1;
-        std::pair<Point, int> result = graph->insert_steiner_center(*cdt, it, num_obtuse);
+
+        result = graph->insert_steiner_center(*cdt, it, num_obtuse);
         std::cout << "centroid is" << result.first << std::endl;
         std::cout << "improvement is" << result.second << std::endl;
         if (max_improvement < result.second) {
             max_improvement = result.second;
             max_pair = result;
         }
+
+        result = graph->insert_steiner_mid(*cdt, it, num_obtuse);
+        std::cout << "midpoint is" << result.first << std::endl;
+        std::cout << "improvement is" << result.second << std::endl;
+        if (max_improvement < result.second) {
+            max_improvement = result.second;
+            max_pair = result;
+        }
+
+        result = graph->insert_steiner_bisection(*cdt, it, num_obtuse);
+        std::cout << "bisection point is" << result.first << std::endl;
+        std::cout << "improvement is" << result.second << std::endl;
+        if (max_improvement < result.second) {
+            max_improvement = result.second;
+            max_pair = result;
+        }
+
+    
+        // result = graph->insert_steiner_projection(*cdt, it, num_obtuse);
+        // std::cout << "projection point is" << result.first << std::endl;
+        // std::cout << "improvement is" << result.second << std::endl;
+        // if (max_improvement < result.second) {
+        //     max_improvement = result.second;
+        //     max_pair = result;
+        // }
+
+
         std::cout << "improvement is currently !!!!!!!!!!!!!! " << max_improvement << std::endl;
         if (max_improvement < 0) {
             continue;
@@ -128,12 +157,14 @@ int main(int  argc, char *argv[]) {
             //     // graph->insert_steiner_center(cdt);
             //     break;
             case mid_point:
+                test(graph, &cdt);
                 // std::cout << "midpoint" << std::endl;
-                graph->insert_steiner_mid(&cdt);
+                // graph->insert_steiner_mid(&cdt);
                 break;
             case bisector_point:
+                test(graph, &cdt);
                 // std::cout << "bisector" << std::endl;
-                graph->insert_steiner_bisection(&cdt);
+                // graph->insert_steiner_bisection(&cdt);
                 break;
             case projection_point:
                 graph->insert_steiner_projection(&cdt);
