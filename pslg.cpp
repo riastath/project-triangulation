@@ -301,77 +301,71 @@ std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_han
 
 }
 
-void PSLG::insert_steiner_projection(CDT *instance) {
-    CDT::Finite_faces_iterator it;
+std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuce) {
 
-    for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
-        // Point a = it->vertex(0)->point();
-        // Point b = it->vertex(1)->point();
-        // Point c = it->vertex(2)->point();
+    Point projection_point;
+    int improvement;
+    bool found = false;
+    for (int j = 0; j < 3; j++) {
+        Point p0 = face->vertex(j)->point();
+        Point p1 = face->vertex((j+1)%3)->point();
+        Point p2 = face->vertex((j+2)%3)->point();
 
-        // double angle_A = angle(a, b, c);
-        // double angle_B = angle(b, a, c);
-        // double angle_C = angle(c, a, b);
-        for (int j = 0; j < 3; j++) {
-            Point p0 = it->vertex(j)->point();
-            Point p1 = it->vertex((j+1)%3)->point();
-            Point p2 = it->vertex((j+2)%3)->point();
-
-            if (angle(p0,p1,p2) <= 90) {
-                continue;
-            }
-
-            std::cout << "point0: " << p0 << std::endl;
-            std::cout << "point1: " << p1 << std::endl;
-            std::cout << "point2: " << p2 << std::endl;
-
-            // line is: y=b, and per_line is: x=b_per.
-            double mult = 0.000000001;
-            int dirx = 1;
-            int diry = 1;
-            double x,y;
-            if (p2.x() == p1.x()) {
-                x = p1.x();
-                y = p0.y();
-            }
-            else if (p2.y() == p1.y()) {
-                x = p0.x();
-                y = p1.y();
-            }
-            else {
-                double slope = (p2.y() - p1.y())/(p2.x() - p1.x());
-                double slope_per = -1/slope;
-
-                double b = p1.y() - slope * p1.x();
-                double b_per = p0.y() - slope_per * p0.x();
-
-                x = (b_per - b) / (slope - slope_per);
-                y = slope_per * x + b_per;
-
-                // modifying points (extend slightly outwards to negate infinitly small faces)
-                dirx = (x - p0.x()) / abs(x - p0.x());
-                diry = (y - p0.y()) / abs(y - p0.y());
-                std::cout << "dirs: " << dirx << " , " << diry << std::endl;
-                std::cout << "before: " << x << " , " << y << std::endl;
-
-                x += dirx * 1 * mult;
-                y += diry * dirx * slope_per * mult;
-                std::cout << "after: " << x << " , " << y << std::endl;
-            }
-
-            
-            
-            Point projection_point = {x,y};
-            std::cout << "point is: " << x << ", " << y << std::endl;
-            insert_steiner_point(projection_point);
-            std::cout << "point inserted" << std::endl;
+        if (angle(p0,p1,p2) <= 90) {
+            continue;
         }
-    
+        std::cout << "point0: " << p0 << std::endl;
+        std::cout << "point1: " << p1 << std::endl;
+        std::cout << "point2: " << p2 << std::endl;
+
+        // line is: y=b, and per_line is: x=b_per.
+        double mult = 0.000000001; // offset because cgal is cgal
+        int dirx = 1;
+        int diry = 1;
+        double x,y;
+        if (p2.x() == p1.x()) {
+            x = p1.x();
+            y = p0.y();
+        }
+        else if (p2.y() == p1.y()) {
+            x = p0.x();
+            y = p1.y();
+        }
+        else {
+            double slope = (p2.y() - p1.y())/(p2.x() - p1.x());
+            double slope_per = -1/slope;
+
+            double b = p1.y() - slope * p1.x();
+            double b_per = p0.y() - slope_per * p0.x();
+
+            x = (b_per - b) / (slope - slope_per);
+            y = slope_per * x + b_per;
+
+            // modifying points (extend slightly outwards to negate infinitly small faces)
+            dirx = (x - p0.x()) / abs(x - p0.x());
+            diry = (y - p0.y()) / abs(y - p0.y());
+            std::cout << "dirs: " << dirx << " , " << diry << std::endl;
+            std::cout << "before: " << x << " , " << y << std::endl;
+
+            x += dirx * 1 * mult;
+            y += diry * abs(slope_per) * mult;
+            std::cout << "after: " << x << " , " << y << std::endl;
+        }
+
+        projection_point = {x,y};
+        found = true;
     }
-    for (const Point& p: steiner_points) {
-        instance->insert(p);
+
+    if (found == false) {
+        return std::make_pair(Point(NAN,NAN), -1);
     }
-    std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
+
+    instance.insert(projection_point);
+    int num_after = is_obtuse_gen(&instance);
+
+    improvement = num_obtuce - num_after;
+
+    return std::make_pair(projection_point, improvement);
 }
 
 void PSLG::insert_all_steiner(CDT *cdt) {

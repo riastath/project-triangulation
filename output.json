@@ -1,17 +1,13 @@
 {
     "content_type": "CG_SHOP_2025_Solution",
-    "instance_uid": "test_2",
+    "instance_uid": "test_1",
     "steiner_points_x": [
-        "40",
-        "70",
-        "40",
-        "70"
+        "20",
+        "26.235294116647058"
     ],
     "steiner_points_y": [
-        "20",
-        "40",
-        "40",
-        "60"
+        "50",
+        "66.941176475088227"
     ],
     "edges": ""
 }
