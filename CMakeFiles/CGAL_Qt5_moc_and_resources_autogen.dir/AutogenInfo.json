@@ -218,7 +218,9 @@
 	"MOC_COMPILATION_FILE" : "/home/maria/project1/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
+		"BOOST_ALLOW_DEPRECATED_HEADERS",
 		"BOOST_ALL_NO_LIB",
+		"BOOST_BIND_GLOBAL_PLACEHOLDERS",
 		"CGAL_USE_BASIC_VIEWER",
 		"CGAL_USE_GMPXX=1",
 		"QT_CORE_LIB",

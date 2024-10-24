@@ -111,7 +111,7 @@ bool PSLG::is_obtuse(Point a, Point b, Point c) {
 
 
 // Version 2 of the obtuse checking function, to check for the actual triangulation (not just a triangle given)
-bool PSLG::is_obtuse_gen(CDT* instance) {
+int PSLG::is_obtuse_gen(CDT* instance) {
     int number_of_obtuce = 0;
     CDT::Finite_faces_iterator it;
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
@@ -142,7 +142,8 @@ bool PSLG::is_obtuse_gen(CDT* instance) {
         }
     }
     std::cout << "///// obtuce triangles foud: " << number_of_obtuce << " \\\\\\\\\\" << std::endl; 
-    return false;   // no obtuse triangle found in the instance
+    // return false;   // no obtuse triangle found in the instance
+    return number_of_obtuce;
 }
 
 // Simply insert the point in the steiner vector 
@@ -151,60 +152,46 @@ void PSLG::insert_steiner_point(Point point) {
 }
 
 // Steiner point method 1 : insert in center 
-void PSLG::insert_steiner_center(CDT *instance) {
-    CDT::Finite_faces_iterator it;
-    // std::vector<Point> steiner_points;  // to insert the steiner points
+std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle face, int num_obtuse) {
 
-    for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
-        // std::cout << "entered loop" << std::endl;
-        // Point a = it->vertex(0)->point();
-        // Point b = it->vertex(1)->point();
-        // Point c = it->vertex(2)->point();
-        Point extra;
-        int i;
-        bool found = false;
-        for (i = 0; i < 3; i++) {
-            // std::cout << "help" << std::endl;
-            if (angle(it->vertex(i)->point(), it->vertex((i+1)%3)->point(), it->vertex((i+2)%3)->point()) <= 90) {
-                // std::cout << "it not obtuce" << std::endl;
-                continue;
-            }
-            found = true;
-            // std::cout << "found obtuce" << std::endl;
-            CDT::Face_handle neigh = it->neighbor(i);
-            for (int j = 0; j < 3; j++) {
-                if (neigh->vertex(j)->point() == it->vertex(i)->point() || neigh->vertex(j)->point() == it->vertex((i+1)%3)->point() || neigh->vertex(j)->point() == it->vertex((i+2)%3)->point()) {
-                    continue;
-                }
-                extra = neigh->vertex(j)->point();
-                break;
-            }
-            break;
-        }
-        // std::cout << "exit loop" << std::endl;
-        if (found == false) {
+    Point extra;
+    int i;
+    bool found = false;
+    for (i = 0; i < 3; i++) {
+        // std::cout << "help" << std::endl;
+        if (angle(face->vertex(i)->point(), face->vertex((i+1)%3)->point(), face->vertex((i+2)%3)->point()) <= 90) {
+            // std::cout << "it not obtuce" << std::endl;
             continue;
         }
-        Point a = it->vertex(i)->point();
-        Point b = it->vertex((i+1)%3)->point();
-        Point c = it->vertex((i+2)%3)->point();
-        // std::cout << "Points: " << std::endl;
-        // std::cout << a << std::endl << b << std::endl << c << std::endl << extra << std::endl;
-        Point center = CGAL::centroid(a, b, c, extra);
-        // std::cout << "center is: " << center << std::endl;
-        insert_steiner_point(center);
-
-        // if (is_obtuse(a, b, c)) {
-        //     Point center = CGAL::centroid(a, b, c);
-        //     std::cout << "center is: " << center << std::endl;
-        //     insert_steiner_point(center);
-        // }
+        found = true;
+        // std::cout << "found obtuce" << std::endl;
+        CDT::Face_handle neigh = face->neighbor(i);
+        for (int j = 0; j < 3; j++) {
+            if (neigh->vertex(j)->point() == face->vertex(i)->point() || neigh->vertex(j)->point() == face->vertex((i+1)%3)->point() || neigh->vertex(j)->point() == face->vertex((i+2)%3)->point()) {
+                continue;
+            }
+            extra = neigh->vertex(j)->point();
+            break;
+        }
+        break;
     }
-
-    for (const Point& p: steiner_points) {
-        instance->insert(p);
+    // std::cout << "exit loop" << std::endl;
+    if (found == false) {
+        return std::make_pair(Point(NAN, NAN), -1);
     }
-    std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
+    Point a = face->vertex(i)->point();
+    Point b = face->vertex((i+1)%3)->point();
+    Point c = face->vertex((i+2)%3)->point();
+    // std::cout << "Points: " << std::endl;
+    // std::cout << a << std::endl << b << std::endl << c << std::endl << extra << std::endl;
+    Point center = CGAL::centroid(a, b, c, extra);
+    instance.insert(center);
+    int num_after = is_obtuse_gen(&instance);
+    // std::cout << "center is: " << center << std::endl;
+    // insert_steiner_point(center);
+    int improvement = num_obtuse-num_after;
+    return std::make_pair(center, improvement);
+
 }
 
 // Steiner point method 2 : insert midpoint
@@ -387,6 +374,13 @@ void PSLG::insert_steiner_projection(CDT *instance) {
     }
     for (const Point& p: steiner_points) {
         instance->insert(p);
+    }
+    std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
+}
+
+void PSLG::insert_all_steiner(CDT *cdt) {
+    for (const Point& p: steiner_points) {
+        cdt->insert(p);
     }
     std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }

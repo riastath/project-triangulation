@@ -48,6 +48,10 @@ add_to_cached_list( CGAL_EXECUTABLE_TARGETS project )
 # Link the executable to CGAL and third-party libraries
 target_link_libraries(project PRIVATE CGAL::CGAL)
 
+#ignore BOOST deprecated headers
+add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
+add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
+
 
 if (CGAL_Qt5_FOUND)
   add_definitions(-DCGAL_USE_BASIC_VIEWER)

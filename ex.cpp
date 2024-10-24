@@ -11,6 +11,33 @@ enum action {
     projection_point
 };
 
+void test(PSLG *graph, CDT *cdt) {
+    CDT::Finite_faces_iterator it;
+    int num_obtuse = graph->is_obtuse_gen(cdt);
+    int max_improvement = -1;
+    std::pair<Point, int> max_pair;
+
+    for (it = cdt->finite_faces_begin(); it != cdt->finite_faces_end(); it++) {
+        max_improvement = -1;
+        std::pair<Point, int> result = graph->insert_steiner_center(*cdt, it, num_obtuse);
+        std::cout << "centroid is" << result.first << std::endl;
+        std::cout << "improvement is" << result.second << std::endl;
+        if (max_improvement < result.second) {
+            max_improvement = result.second;
+            max_pair = result;
+        }
+        std::cout << "improvement is currently !!!!!!!!!!!!!! " << max_improvement << std::endl;
+        if (max_improvement < 0) {
+            continue;
+        }
+        std::cout << "point to insert is !!!!!!!!!!!! " << result.first << std::endl;
+        graph->insert_steiner_point(max_pair.first);
+    }
+    graph->insert_all_steiner(cdt);
+    std::cout << " ----------  inserted ------------- " << std::endl;
+}
+
+
 void argument_handler(int argc, char* argv[], enum action* actions, std::string*filename) {
     int a = 0;
     for (int i = 1;  i < argc; i++) {
@@ -95,9 +122,11 @@ int main(int  argc, char *argv[]) {
                 graph->flip_edges(&cdt);
                 break;
             case center_point:
-                // std::cout << "center" << std::endl;
-                graph->insert_steiner_center(&cdt);
+                test(graph, &cdt);
                 break;
+            //     // std::cout << "center" << std::endl;
+            //     // graph->insert_steiner_center(cdt);
+            //     break;
             case mid_point:
                 // std::cout << "midpoint" << std::endl;
                 graph->insert_steiner_mid(&cdt);

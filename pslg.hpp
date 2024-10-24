@@ -46,13 +46,14 @@ public:
 
     double angle(Point a, Point b, Point c);
     bool is_obtuse(Point a, Point b, Point c);
-    bool is_obtuse_gen(CDT* instance);
+    int is_obtuse_gen(CDT* instance);
 
     void insert_steiner_point(Point point);
-    void insert_steiner_center(CDT *instance);
+    std::pair <Point, int> insert_steiner_center(CDT instance, CDT::Face_handle face, int num_obtuse);
     void insert_steiner_mid(CDT *instance);
     void insert_steiner_bisection(CDT *instance);
     void insert_steiner_projection(CDT *instance);
+    void insert_all_steiner(CDT *cdt);
 
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);
     void flip_edges(CDT *cdt);
