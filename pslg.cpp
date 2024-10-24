@@ -254,7 +254,8 @@ void PSLG::insert_steiner_bisection(CDT *instance) {
 
         Point obtuse_vertex;
         Point p_a, p_b;
-        double length_u = 0.0, length_v = 0.0, bisector_length = 0.0;
+        // double length_u = 0.0, length_v = 0.0, bisector_length = 0.0;
+        double length_a = 0.0, length_b = 0.0;
 
         if (angle_A > 90.0) {
             // I need ab and ac
@@ -273,39 +274,39 @@ void PSLG::insert_steiner_bisection(CDT *instance) {
             p_b = b;
         } else continue;    // no obtuse angle -> check next face
 
-        // // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex and points 
-        // length_a = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_a));
-        // length_b = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_b));
+        // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex and points 
+        length_a = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_a));
+        length_b = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_b));
 
-        // // Calculate ratio to find the point, using the math formula / equation with the coordinates of the points
-        // // (Couldn't find the intersection using CGAL vectors)
-        // double ratio_a = length_a / (length_a + length_b);
-        // double ratio_b = length_b / (length_a + length_b);
+        // Calculate ratio to find the point, using the math formula / equation with the coordinates of the points
+        // (Couldn't find the intersection using CGAL vectors)
+        double ratio_a = length_a / (length_a + length_b);
+        double ratio_b = length_b / (length_a + length_b);
 
-        // Point bisection_point {
-        //     ratio_a * p_a.x() + ratio_b * p_b.x(),
-        //     ratio_a * p_a.y() + ratio_b * p_b.y(),
-        // };
+        Point bisection_point {
+            ratio_a * p_a.x() + ratio_b * p_b.x(),
+            ratio_a * p_a.y() + ratio_b * p_b.y(),
+        };
 
-        // Other method : finding the bisector using the theorem + formula
-        // u and v are the sides resulting from the obtuse vertex
-        Vector u = p_a - obtuse_vertex;
-        Vector v = p_b - obtuse_vertex;
+        // // Other method : finding the bisector using the theorem + formula
+        // // u and v are the sides resulting from the obtuse vertex
+        // Vector u = p_a - obtuse_vertex;
+        // Vector v = p_b - obtuse_vertex;
 
-        // Find the magnitudes of the vectors (lengths)
-        length_u = std::sqrt(u.squared_length());
-        length_v = std::sqrt(v.squared_length());
+        // // Find the magnitudes of the vectors (lengths)
+        // length_u = std::sqrt(u.squared_length());
+        // length_v = std::sqrt(v.squared_length());
 
-        // from formula bisector = (a + b) / |a + b| 
-        Vector bisector = (u / length_u) + (v / length_v);  // bisector's direction
-        bisector_length = std::sqrt(bisector.squared_length());
-        bisector = bisector / bisector_length;  // this sum needs to be normalized 
+        // // from formula bisector = (a + b) / |a + b| 
+        // Vector bisector = (u / length_u) + (v / length_v);  // bisector's direction
+        // bisector_length = std::sqrt(bisector.squared_length());
+        // bisector = bisector / bisector_length;  // this sum needs to be normalized 
 
-        // Use intersection of the bisector with the opposite edge / vector, to find the point we need
-        Vector opposite = p_b - p_a;
-        double t = CGAL::scalar_product(bisector, u) / CGAL::scalar_product(bisector, opposite);
+        // // Use intersection of the bisector with the opposite edge / vector, to find the point we need
+        // Vector opposite = p_b - p_a;
+        // double t = CGAL::scalar_product(bisector, u) / CGAL::scalar_product(bisector, opposite);
 
-        Point bisection_point = p_a + t * opposite; // use the equation form
+        // Point bisection_point = p_a + t * opposite; // use the equation form
 
         insert_steiner_point(bisection_point);
     }

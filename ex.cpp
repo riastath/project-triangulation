@@ -81,27 +81,6 @@ int main(int  argc, char *argv[]) {
 
     CDT cdt;
     graph->delaunay_passer(&cdt);
-    // CGAL::draw(cdt);
-
-    // for (CDT::Face_handle fh: cdt.finite_face_handles()) {
-    //     std::cout << "flipable: " << cdt.is_flipable(fh,0) << std::endl;
-    //     cdt.flip(fh,0);  // from face fh, flip edge "facing" the corner 0
-    //     break;
-    // }
-    // CGAL::draw(cdt);
-
-    // bool res = graph->is_obtuse(&cdt);
-    // CGAL::draw(cdt);
-    // std::cout << res << std::endl;
-    // if (res) std::cout << "Obtuse triangles exist in the instance" << std::endl;
-    // else std::cout << "No obtuse triangles in the instance!" << std::endl;
-
-    // graph->insert_steiner_center(&cdt);
-    // graph->insert_steiner_mid(&cdt);
-    // graph->is_obtuse_gen(&cdt);
-
-    // graph->insert_steiner_bisection(&cdt);
-    // graph->is_obtuse_gen(&cdt);
 
     std::cout << std::endl;
     std::cout << "Before processing:" << std::endl;
@@ -134,29 +113,12 @@ int main(int  argc, char *argv[]) {
         a++;
     }
 
-
-    // graph->flip_edges(&cdt);
-    // graph->insert_steiner_center(&cdt);
-    // graph->insert_steiner_mid(&cdt);
-    // graph->insert_steiner_bisection(&cdt);
-
     std::cout << std::endl;
     std::cout << "After processing:" << std::endl;
     graph->is_obtuse_gen(&cdt);
     std::cout << std::endl;
-
-    // int faxes = 0;
-    // for (CDT::Face_handle fh: cdt.finite_face_handles()) {
-    //     std::cout << "face:" << std::endl;
-    //     std::cout << "validity: " << fh->is_valid() << std::endl;  
-    //     std::cout << fh->vertex(0)->point() << " " << fh->vertex(1)->point() << " " << fh->vertex(2)->point() << std::endl;
-    //     faxes++;
-    // }
-    // std::cout << "num of faces: " << faxes << std::endl;
-
     CGAL::draw(cdt);
 
-    // -- Starting here, testing for the output json using property tree -- //
     graph->produce_output();
 
     return 0;

@@ -11,6 +11,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Vector_2.h>                                      // used for angle calculation
 
+
 // for json parsing, reading and writing
 namespace pt = boost::property_tree;
 
