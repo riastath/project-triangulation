@@ -147,24 +147,17 @@ int main(int  argc, char *argv[]) {
     while (actions[a] != none) {
         switch(actions[a]){
             case flip:
-                // std::cout << "flip" << std::endl;
                 graph->flip_edges(&cdt);
                 break;
             case center_point:
                 test(graph, &cdt);
                 break;
-            //     // std::cout << "center" << std::endl;
-            //     // graph->insert_steiner_center(cdt);
-            //     break;
             case mid_point:
                 test(graph, &cdt);
-                // std::cout << "midpoint" << std::endl;
-                // graph->insert_steiner_mid(&cdt);
+
                 break;
             case bisector_point:
                 test(graph, &cdt);
-                // std::cout << "bisector" << std::endl;
-                // graph->insert_steiner_bisection(&cdt);
                 break;
             case projection_point:
                 test(graph, &cdt);
@@ -183,6 +176,3 @@ int main(int  argc, char *argv[]) {
 
     return 0;
 }
-
-
-// for looping : have an iteration limit and flag for obtuse's existence, so as long as there's an obtuse left, keep looping

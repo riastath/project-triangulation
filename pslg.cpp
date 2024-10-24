@@ -41,16 +41,6 @@ PSLG::PSLG(std::string filename) {
 
 }
 
-// get uid -> probably redundant
-std::string PSLG::get_instance_uid() {
-    return uid;
-}
-    
-// get steiner points
-std::vector<Point> PSLG::get_steiner() {
-    return steiner_points;
-}
-
 // To print class members -> for testing
 void PSLG::printer() {
     std::cout << "uid is: " << uid << std::endl;
@@ -80,7 +70,7 @@ double PSLG::angle(Point a, Point b, Point c) {
     Vector u = b - a;
     Vector v = c - a;
 
-    double product = u * v; // use scalar product here ?
+    double product = u * v;
     // |u| and |v|. no length function exists, so using square length and taking its root
     double ulength = std::sqrt(u.squared_length());
     double vlength = std::sqrt(v.squared_length());
@@ -112,11 +102,10 @@ bool PSLG::is_obtuse(Point a, Point b, Point c) {
 
 // Version 2 of the obtuse checking function, to check for the actual triangulation (not just a triangle given)
 int PSLG::is_obtuse_gen(CDT* instance) {
-    int number_of_obtuce = 0;
+    int number_of_obtuse = 0;
     CDT::Finite_faces_iterator it;
     for (it = instance->finite_faces_begin(); it != instance->finite_faces_end(); it++) {
-        // we need to examine every vertex using the iterator, and find the 3 points of each triangle
-        // these examine the 1st, 2nd and 3rd vertex respectively.
+        // we need to examine every vertex using the iterator, and find the 3 points of each triangle. these examine the 1st, 2nd and 3rd vertex respectively.
         // vertex() returns a handle, which is akin to a pointer to an object,
         // so, using this we get the point with its coordinates (x,y) from the corresponding vertex.
         Point a = it->vertex(0)->point();
@@ -132,18 +121,15 @@ int PSLG::is_obtuse_gen(CDT* instance) {
         }
 
         if (angle_A > 90.0 || angle_B > 90.0 || angle_C > 90.0) {
-            // return true;    // an obtuse triangle is found in the instance
-            // std::cout << "found" << std::endl;  // to test
-            std::cout << "points of obtuce:" << std::endl;
+            std::cout << "points of obtuse:" << std::endl;
             std::cout << a << " " << angle_A << std::endl;
             std::cout << b << " " << angle_B << std::endl;
             std::cout << c << " " << angle_C << std::endl; 
-            number_of_obtuce++;
+            number_of_obtuse++;
         }
     }
-    std::cout << "///// obtuce triangles foud: " << number_of_obtuce << " \\\\\\\\\\" << std::endl; 
-    // return false;   // no obtuse triangle found in the instance
-    return number_of_obtuce;
+    std::cout << "///// obtuse triangles foud: " << number_of_obtuse << " \\\\\\\\\\" << std::endl; 
+    return number_of_obtuse;
 }
 
 // Simply insert the point in the steiner vector 
@@ -157,13 +143,10 @@ std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle
     int i;
     bool found = false;
     for (i = 0; i < 3; i++) {
-        // std::cout << "help" << std::endl;
         if (angle(face->vertex(i)->point(), face->vertex((i+1)%3)->point(), face->vertex((i+2)%3)->point()) <= 90) {
-            // std::cout << "it not obtuce" << std::endl;
             continue;
         }
         found = true;
-        // std::cout << "found obtuce" << std::endl;
         CDT::Face_handle neigh = face->neighbor(i);
         for (int j = 0; j < 3; j++) {
             if (neigh->vertex(j)->point() == face->vertex(i)->point() || neigh->vertex(j)->point() == face->vertex((i+1)%3)->point() || neigh->vertex(j)->point() == face->vertex((i+2)%3)->point()) {
@@ -174,7 +157,6 @@ std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle
         }
         break;
     }
-    // std::cout << "exit loop" << std::endl;
     if (found == false) {
         return std::make_pair(Point(NAN, NAN), -1);
     }
@@ -301,7 +283,7 @@ std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_han
 
 }
 
-std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuce) {
+std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuse) {
 
     Point projection_point;
     int improvement;
@@ -363,7 +345,7 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
     instance.insert(projection_point);
     int num_after = is_obtuse_gen(&instance);
 
-    improvement = num_obtuce - num_after;
+    improvement = num_obtuse - num_after;
 
     return std::make_pair(projection_point, improvement);
 }
@@ -397,7 +379,7 @@ void PSLG::flip_edges(CDT *cdt) {
 
         for (int j = 0; j < 3; j++) {
             
-            // flip only if obtuce angle exists    
+            // flip only if obtuse angle exists    
             if (!is_obtuse(fh->vertex(j)->point(), fh->vertex((j+1)%3)->point(), fh->vertex((j+2)%3)->point())) {
                 continue;
             }

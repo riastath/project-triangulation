@@ -11,7 +11,6 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Vector_2.h>                                      // used for angle calculation
 
-
 // for json parsing, reading and writing
 namespace pt = boost::property_tree;
 
@@ -38,16 +37,17 @@ private:
 public:
     PSLG(std::string filename);         // constructor
 
-    std::string get_instance_uid();
-    std::vector<Point> get_steiner();
-
+    // Helper functions
     void printer();
     void delaunay_passer(CDT* delaunay_instance);
+    void produce_output();
 
+    // Obtuse checking functions
     double angle(Point a, Point b, Point c);
     bool is_obtuse(Point a, Point b, Point c);
     int is_obtuse_gen(CDT* instance);
 
+    // Steiner point functions
     void insert_steiner_point(Point point);
     void insert_all_steiner(CDT *cdt);
     std::pair <Point, int> insert_steiner_center(CDT instance, CDT::Face_handle face, int num_obtuse);
@@ -55,8 +55,8 @@ public:
     std::pair <Point, int> insert_steiner_bisection(CDT instance, CDT::Face_handle face, int num_obtuse);
     std::pair <Point, int> insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuse);
 
+    // Edge flipping functions
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);
     void flip_edges(CDT *cdt);
 
-    void produce_output();
 };
