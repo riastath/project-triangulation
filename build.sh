@@ -1,9 +1,4 @@
 #!/bin/bash
-
-echo "Removing..."
-rm -rf CMakeCache.txt CMakeFiles
-
-cgal_create_CMakeLists -s project
 cmake -DCGAL_DIR=/usr/lib/CGAL
 
 echo "Building..."
