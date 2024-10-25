@@ -114,7 +114,6 @@ int PSLG::is_obtuse_gen(CDT* instance) {
             number_of_obtuse++;
         }
     }
-    std::cout << "///// obtuse triangles foud: " << number_of_obtuse << " \\\\\\\\\\" << std::endl; 
     return number_of_obtuse;
 }
 
@@ -311,7 +310,6 @@ void PSLG::insert_all_steiner(CDT *cdt) {
     for (const Point& p: steiner_points) {
         cdt->insert(p);
     }
-    std::cout << "steiner points inserted are" << steiner_points.size() << std::endl;
 }
 
 // Check if a triangle is infinite (through face handle)

@@ -2,16 +2,9 @@
 #include <fstream>
 #include <iostream>
 
-enum action {
-    none,
-    flip,
-    center_point,
-    mid_point,
-    bisector_point,
-    projection_point
-};
+void process_instance(PSLG *graph, CDT *cdt) {
+    int iterations = 0, max_iterations = 20;
 
-void test(PSLG *graph, CDT *cdt) {
     while (true) {
         int inserted = 0;
         CDT::Finite_faces_iterator it;
@@ -23,6 +16,7 @@ void test(PSLG *graph, CDT *cdt) {
         for (it = cdt->finite_faces_begin(); it != cdt->finite_faces_end(); it++) {
             max_improvement = -1;
 
+            // Check steiner methods and compare improvement value
             result = graph->insert_steiner_center(*cdt, it, num_obtuse);
             if (max_improvement < result.second) {
                 max_improvement = result.second;
@@ -40,7 +34,6 @@ void test(PSLG *graph, CDT *cdt) {
                 max_improvement = result.second;
                 max_pair = result;
             }
-
         
             result = graph->insert_steiner_projection(*cdt, it, num_obtuse);
             if (max_improvement < result.second) {
@@ -52,131 +45,74 @@ void test(PSLG *graph, CDT *cdt) {
                 continue;
             }
 
-            std::cout << "improvement is currently !!!!!!!!!!!!!! " << max_improvement << std::endl;
-            graph->insert_steiner_point(max_pair.first);
+            graph->insert_steiner_point(max_pair.first);    // insert steiner point picked
             inserted++;
         } 
-        // std::cout << "inserting : " << inserted << std::endl;
+
         if (inserted <= 0) {
-            std::cout << "no change hapening, exiting" << std::endl;
             break;
         }
+        
         graph->insert_all_steiner(cdt);
-        std::cout << " ----------  inserted ------------- " << std::endl;
 
-        std::cout << "final num of obtuce: " << graph->is_obtuse_gen(cdt) << std::endl;
-        // int test = 0;
-        // std::cin >> test;
-        // if (test== -1) {
-        //     break;
-        // }
-    }
-}
+        std::cout << "Final number of obtuse angles is currently: " << graph->is_obtuse_gen(cdt) << std::endl;
 
-
-void argument_handler(int argc, char* argv[], enum action* actions, std::string*filename) {
-    int a = 0;
-    for (int i = 1;  i < argc; i++) {
-        if (argv[i][0] != '-') {
-            continue;
-        }
-        if (argv[i][1] == 'i') { // get filename
-            if (i+1 == argc) {
-                std::cout << "filename not given, reverting to default" << std::endl;
-                return;
-            }
-            if (argv[i+1][0] == '-') {
-                std::cout << "filename not given, reverting to default" << std::endl;
-                return;
-            }
-            *filename = argv[i+1];
-            continue;
-        }
-        switch (argv[i][1]) {
-            case 'f':
-                actions[a] = flip;
-                a++;
-                break;
-            case 'c':
-                actions[a] = center_point;
-                a++;
-                break;
-            case 'm':
-                actions[a] = mid_point;
-                a++;
-                break;
-            case 'b':
-                actions[a] = bisector_point;
-                a++;
-                break;
-            case 'p':
-                actions[a] = projection_point;
-                a++;
-                break;
-            default: 
-                std::cout << "unrecognized command: " << argv[i] << std::endl;
-                break;
+        iterations++;
+        // for instances that do not converge
+        if (iterations >= max_iterations) {
+            break;
         }
     }
 }
+
 
 int main(int  argc, char *argv[]) {
     std::string filename = "tests/data.json";
-    
-    enum action actions[10];
-    for (int i = 0; i < 10; i++) {
-        actions[i] = none;
-    }
+    bool flip = false;
 
-    argument_handler(argc, argv, actions, &filename);
+    for (int i = 1; i < argc; i++) {
+        std::string arg = argv[i];
+        if (arg == "-f") {
+            flip = true;
+        } else {
+            filename = arg;
+        }
+    }
 
     FILE* file = fopen(filename.c_str(), "r");
     if (file == NULL) {
-        std::cout << "file not found, ending program" << std::endl;
+        std::cout << "File not found, ending program" << std::endl;
         return 0;
     }
     fclose(file);
     
 
     PSLG * graph = new PSLG(filename);
-
     CDT cdt;
     graph->delaunay_passer(&cdt);
 
     std::cout << std::endl;
     std::cout << "Before processing:" << std::endl;
-    graph->is_obtuse_gen(&cdt);
+    std:: cout << "Obtuse angles are "<< graph->is_obtuse_gen(&cdt) << std::endl;
     std::cout << std::endl;
 
-    int a = 0;
-    while (actions[a] != none) {
-        switch(actions[a]){
-            case flip:
-                graph->flip_edges(&cdt);
-                break;
-            case center_point:
-                test(graph, &cdt);
-                break;
-            case mid_point:
-                test(graph, &cdt);
+    // Processing
+    std::cout << "Processing begins : " << std::endl; 
 
-                break;
-            case bisector_point:
-                test(graph, &cdt);
-                break;
-            case projection_point:
-                test(graph, &cdt);
-                break;
-        }
-        a++;
+    if (flip) {
+        graph->flip_edges(&cdt);
     }
+
+    process_instance(graph, &cdt);
+    std::cout << "Processing ended. " << std::endl; 
+    // End
 
     std::cout << std::endl;
     std::cout << "After processing:" << std::endl;
-    graph->is_obtuse_gen(&cdt);
+    std:: cout << "Obtuse angles are "<< graph->is_obtuse_gen(&cdt) << std::endl;
     std::cout << std::endl;
-    CGAL::draw(cdt);
 
+    CGAL::draw(cdt);
     graph->produce_output();
 
     return 0;

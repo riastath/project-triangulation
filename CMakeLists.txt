@@ -5,8 +5,6 @@ cmake_minimum_required(VERSION 3.1...3.23)
 
 project( project )
 
-# find_package(CGAL COMPONENTS Qt5)
-
 # CGAL and its components
 find_package( CGAL QUIET COMPONENTS Qt5 )
 
@@ -37,12 +35,7 @@ endif()
 # Creating entries for target: project
 # ############################
 
-# add_executable(test_draw tests/test_draw.cpp qrc_File.cpp qrc_CGAL.cpp qrc_Input.cpp qrc_Triangulation_2.cpp )
-
-# add_to_cached_list( CGAL_EXECUTABLE_TARGETS test_draw )
-
 add_executable(project  ex.cpp pslg.cpp)
-# add_executable(test_draw tests/test_draw.cpp)
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS project )
 
 # Link the executable to CGAL and third-party libraries
@@ -51,7 +44,6 @@ target_link_libraries(project PRIVATE CGAL::CGAL)
 #ignore BOOST deprecated headers
 add_definitions("-DBOOST_ALLOW_DEPRECATED_HEADERS")
 add_definitions("-DBOOST_BIND_GLOBAL_PLACEHOLDERS")
-
 
 if (CGAL_Qt5_FOUND)
   add_definitions(-DCGAL_USE_BASIC_VIEWER)
