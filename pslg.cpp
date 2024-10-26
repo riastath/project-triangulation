@@ -23,10 +23,12 @@ PSLG::PSLG(std::string filename) {
         points_y.push_back(y.second.get_value<int>());
     }
 
+    // create vector with graph points
     for (int i = 0; i < points_x.size(); i++) {
         point_vec.push_back(Point(points_x.at(i), points_y.at(i)));
     }
 
+    // add constraints
     for (pt::ptree::value_type &add : root.get_child("additional_constraints")) {
         int graph_edge[2];
         int x = 0;
@@ -48,6 +50,7 @@ void PSLG::delaunay_passer(CDT* delaunay_instance) {
         delaunay_instance->insert(p);
     }
 
+    // pass the constraints to delaunay istance
     for (const auto& constraint: additional_constraints) {
         delaunay_instance->insert_constraint(constraint.first, constraint.second);
     }
@@ -128,12 +131,14 @@ std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle
     int i;
     bool found = false;
     for (i = 0; i < 3; i++) {
+        // reject non obtuce angles of face
         if (angle(face->vertex(i)->point(), face->vertex((i+1)%3)->point(), face->vertex((i+2)%3)->point()) <= 90) {
             continue;
         }
+
         found = true;
         CDT::Face_handle neigh = face->neighbor(i);
-        for (int j = 0; j < 3; j++) {
+        for (int j = 0; j < 3; j++) { // find the neighboring face's vertex that is not common with the current face
             if (neigh->vertex(j)->point() == face->vertex(i)->point() || neigh->vertex(j)->point() == face->vertex((i+1)%3)->point() || neigh->vertex(j)->point() == face->vertex((i+2)%3)->point()) {
                 continue;
             }
@@ -143,7 +148,7 @@ std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle
         break;
     }
     if (found == false) {
-        return std::make_pair(Point(NAN, NAN), -1);
+        return std::make_pair(Point(NAN, NAN), -1); // return this value if the function was unable to find the steiner point
     }
     Point a = face->vertex(i)->point();
     Point b = face->vertex((i+1)%3)->point();
@@ -155,7 +160,7 @@ std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle
     int num_after = is_obtuse_gen(&instance);
 
     int improvement = num_obtuse - num_after;
-    return std::make_pair(center, improvement);
+    return std::make_pair(center, improvement); // return steiner point and the improvement it will make if inserted
 
 }
 
@@ -245,7 +250,6 @@ std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_han
 }
 
 std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuse) {
-
     Point projection_point;
     int improvement;
     bool found = false;
@@ -258,33 +262,35 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
             continue;
         }
 
-        // line is: y=b, and per_line is: x=b_per.
         double mult = 0.000000001; // offset because cgal is cgal
         int dirx = 1;
         int diry = 1;
         double x,y;
-        if (p2.x() == p1.x()) {
+        if (p2.x() == p1.x()) { // if line equation is: x=b
             x = p1.x();
             y = p0.y();
         }
-        else if (p2.y() == p1.y()) {
+        else if (p2.y() == p1.y()) { // if line equation in y=b
             x = p0.x();
             y = p1.y();
         }
         else {
+            // calculate line equations
             double slope = (p2.y() - p1.y())/(p2.x() - p1.x());
             double slope_per = -1/slope;
 
             double b = p1.y() - slope * p1.x();
             double b_per = p0.y() - slope_per * p0.x();
 
+            // find intersection point
             x = (b_per - b) / (slope - slope_per);
             y = slope_per * x + b_per;
 
-            // modifying points (extend slightly outwards to negate infinitly small faces)
+            // modifying points (extend slightly away from the obtuce point, while on the perpendicular line)
+            // find direction for each coordinate:
             dirx = (x - p0.x()) / abs(x - p0.x());
             diry = (y - p0.y()) / abs(y - p0.y());
-
+            // add apropriate number to extend
             x += dirx * 1 * mult;
             y += diry * abs(slope_per) * mult;
         }
@@ -339,7 +345,7 @@ void PSLG::flip_edges(CDT *cdt) {
                 continue;
             }
 
-            // check if neighbor exists to flip
+            // check if neighbor exists to flip (neghbor != infinite face)
             if (face_is_infinite(fh->neighbor(j), cdt)){
                 continue;
             }
@@ -363,7 +369,7 @@ void PSLG::flip_edges(CDT *cdt) {
                 continue;
             }
 
-            // insert faces to apropriate vectors
+            // insert faces to apropriate vectors to flip
             std::pair<CDT::Face_handle, int> flip_item = std::make_pair(fh, j);
             flip_vec.push_back(flip_item);
             fliped_neighbors.push_back(fh->neighbor(j));
@@ -371,6 +377,7 @@ void PSLG::flip_edges(CDT *cdt) {
 
     }
 
+    // flip faces 
     for (int i = 0; i < flip_vec.size(); i++) {
         std::pair<CDT::Face_handle, int> flip_item = flip_vec.at(i);
         cdt->flip(flip_item.first, flip_item.second);
