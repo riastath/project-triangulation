@@ -11,6 +11,10 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Vector_2.h>                                      // used for angle calculation
 
+#include <CGAL/Triangle_2.h>
+
+#include <numeric> // for std::gcd -> output requirements
+
 // for json parsing, reading and writing
 namespace pt = boost::property_tree;
 
@@ -20,6 +24,8 @@ typedef CGAL::Constrained_Delaunay_triangulation_2<K, CGAL::Default, Itag> CDT;
 typedef CDT::Point Point;
 typedef CDT::Edge Edge;
 typedef K::Vector_2 Vector;
+
+typedef CGAL::Triangle_2<K> Triangle;
 
 // Class for the triangulation process, using delaunay and steiner methods as requested
 class PSLG {
@@ -53,6 +59,7 @@ public:
     std::pair <Point, int> insert_steiner_mid(CDT instance, CDT::Face_handle face, int num_obtuse);
     std::pair <Point, int> insert_steiner_bisection(CDT instance, CDT::Face_handle face, int num_obtuse);
     std::pair <Point, int> insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuse);
+    std::pair <Point, int> insert_steiner_circumcenter(CDT instance, CDT::Face_handle face, int num_obtuse);
 
     // Edge flipping functions
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);

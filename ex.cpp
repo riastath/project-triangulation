@@ -41,6 +41,12 @@ void process_instance(PSLG *graph, CDT *cdt) {
                 max_pair = result;
             }
 
+            result = graph->insert_steiner_circumcenter(*cdt, it, num_obtuse);
+            if (max_improvement < result.second) {
+                max_improvement = result.second;
+                max_pair = result;
+            }
+
             if (max_improvement < 0) {
                 continue;
             }

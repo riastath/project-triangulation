@@ -59,3 +59,9 @@
 Τα μέλη της ομάδας είναι :
 - Γιώργος Πράππας, A.M : 1115202100163
 - Μαρία Σταθοπούλου, Α.Μ : 1115202100177
+
+Το github repository link (private) είναι https://github.com/riastath/project1
+
+
+
+added : triangle, circumcenter with checking? 

@@ -312,6 +312,39 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
     return std::make_pair(projection_point, improvement);
 }
 
+std::pair<Point, int> PSLG::insert_steiner_circumcenter(CDT instance, CDT::Face_handle face, int num_obtuse) {
+    Point a = face->vertex(0)->point();
+    Point b = face->vertex(1)->point();
+    Point c = face->vertex(2)->point();
+
+    Point circumcenter = CGAL::circumcenter(a, b, c);
+
+    Triangle triangle(a, b, c);
+    if (!triangle.has_on_bounded_side(circumcenter)) {  // checking if it's within boundaries?
+        return std::make_pair(Point(NAN, NAN), -1);
+    }
+
+    // circumcenter is valid
+    instance.insert(circumcenter);
+
+    int num_after = is_obtuse_gen(&instance);
+    int improvement = num_obtuse - num_after;
+
+    return std::make_pair(circumcenter, improvement);
+
+    // old version without checking 
+
+    // Point circumcenter = CGAL::circumcenter(a, b, c);
+    // insert_all_steiner(&instance);
+    // instance.insert(circumcenter);
+    
+    // int num_after = is_obtuse_gen(&instance);
+    // int improvement = num_obtuse - num_after;
+
+    // return std::make_pair(circumcenter, improvement);
+    // also need to remove the edge like in centroid
+}
+
 void PSLG::insert_all_steiner(CDT *cdt) {
     for (const Point& p: steiner_points) {
         cdt->insert(p);
@@ -386,6 +419,27 @@ void PSLG::flip_edges(CDT *cdt) {
     std::cout << "Edges fliped are: " << flip_vec.size() << std::endl;
 }
 
+
+std::string fraction_converter(double n) {
+    // int max = 10000;
+
+    // if (n == 0.0) return "0";
+
+    // int sign = (n < 0) ? -1 : 1;
+    // n = std::fabs(n);
+
+    // // Find the closest fraction
+    // int denominator = max;
+    // int numerator = static_cast<int>(n * denominator);
+
+    // // Reduce the fraction using gcd
+    // int gcd_value = std::gcd(numerator, denominator);
+    // numerator /= gcd_value;
+    // denominator /= gcd_value;
+
+    // return std::to_string(sign * numerator) + "/" + std::to_string(denominator);
+}
+
 // Function that produces the final .json output with the data as requested
 void PSLG::produce_output() {
     pt::ptree root;
@@ -398,6 +452,7 @@ void PSLG::produce_output() {
     for (Point point : steiner_points) {
 
         pt::ptree x_node, y_node;       // different nodes for each coordinate, to make the pairs with the empty string to insert
+
         x_node.put("", point.x());
         y_node.put("", point.y());
 
@@ -425,7 +480,7 @@ void PSLG::produce_output() {
         p2_tree.put("", p2_pos);
         edge_node.push_back(std::make_pair("", p1_tree));
         edge_node.push_back(std::make_pair("", p2_tree));
-
+        
         edges.push_back(std::make_pair("", edge_node));
     }
 
