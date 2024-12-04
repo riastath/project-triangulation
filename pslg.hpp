@@ -9,8 +9,8 @@
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 #include <CGAL/draw_triangulation_2.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+// #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Vector_2.h>                                      // used for angle calculation
-
 #include <CGAL/Triangle_2.h>
 
 #include <numeric> // for std::gcd -> output requirements
@@ -19,6 +19,7 @@
 namespace pt = boost::property_tree;
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+// typedef CGAL::Exact_predicates_exact_constructions_kernel K;
 typedef CGAL::Exact_predicates_tag Itag;
 typedef CGAL::Constrained_Delaunay_triangulation_2<K, CGAL::Default, Itag> CDT;
 typedef CDT::Point Point;
@@ -40,16 +41,25 @@ private:
     int num_points;
     int num_constraints;
 
+    // // new members for part 2 
+    // std::string method; // the algorithm selected
+    // std::map<std::string, double> parameters; // for each algorithm
+    // bool delaunay; // a flag to know if we should start with delaunay or not 
+    // int obtuse_count = 0; // maybe
+
 public:
     PSLG(std::string filename);         // constructor
 
+    CDT return_cdt(CDT cdt, Point point);
+
     // Helper functions
     void delaunay_passer(CDT* delaunay_instance);
-    void produce_output();
+    void produce_output(CDT instance);
 
     // Obtuse checking functions
     double angle(Point a, Point b, Point c);
     bool is_obtuse(Point a, Point b, Point c);
+    bool is_obtuse_face(CDT::Face_handle f);
     int is_obtuse_gen(CDT* instance);
 
     // Steiner point functions
@@ -64,5 +74,10 @@ public:
     // Edge flipping functions
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);
     void flip_edges(CDT *cdt);
+
+    // // new
+    int get_num_steiner_points();
+    // std::string get_method();
+    // std::pair<Point, int> random_steiner_select(CDT* instance, int num_obtuse); 
 
 };

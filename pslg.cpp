@@ -41,7 +41,31 @@ PSLG::PSLG(std::string filename) {
         additional_constraints.push_back(constr);
     }
 
+    // // new parameters added for part 2 : method, etc.
+    // method = root.get<std::string>("method");
+    // delaunay = root.get<bool>("delaunay");
+
+    // // parameters will be different for each algorithm
+    // for (const auto &param : root.get_child("parameters")) {
+    //     parameters[param.first] = param.second.get_value<double>();
+    // }
+
 }
+
+CDT PSLG::return_cdt(CDT cdt, Point point) {
+    cdt.insert(point);
+    return cdt;
+}
+
+// getters (if needed)
+int PSLG::get_num_steiner_points() {
+    return steiner_points.size();
+}
+
+// std::string PSLG::get_method() {
+//     return method;
+// }
+
 
 // To pass all points and edges to the delaunay triangulation instance
 void PSLG::delaunay_passer(CDT* delaunay_instance) {
@@ -64,9 +88,13 @@ double PSLG::angle(Point a, Point b, Point c) {
     Vector v = c - a;
 
     double product = u * v;
+    // double product = CGAL::to_double(u * v);
     // |u| and |v|. no length function exists, so using square length and taking its root
     double ulength = std::sqrt(u.squared_length());
     double vlength = std::sqrt(v.squared_length());
+    // double ulength = std::sqrt(CGAL::to_double(u.squared_length()));
+    // double vlength = std::sqrt(CGAL::to_double(v.squared_length()));
+
 
     double cosine = product/(ulength * vlength);
     
@@ -119,6 +147,18 @@ int PSLG::is_obtuse_gen(CDT* instance) {
     }
     return number_of_obtuse;
 }
+
+// Function to check for obtuse triangles using face handle
+bool PSLG::is_obtuse_face(CDT::Face_handle f) {
+
+    Point point_a = (Point)f->vertex(0)->point();
+    Point point_b = (Point)f->vertex(1)->point();
+    Point point_c = (Point)f->vertex(2)->point();
+
+    if (is_obtuse(point_a, point_b, point_c)) return true;
+    else return false;
+}
+
 
 // Simply insert the point in the steiner vector 
 void PSLG::insert_steiner_point(Point point) {
@@ -231,9 +271,15 @@ std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_han
     // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex and points 
     length_a = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_a));
     length_b = std::sqrt(CGAL::squared_distance(obtuse_vertex, p_b));
+    // length_a = std::sqrt(CGAL::to_double(CGAL::squared_distance(obtuse_vertex, p_a)));
+    // length_b = std::sqrt(CGAL::to_double(CGAL::squared_distance(obtuse_vertex, p_b)));
 
     // Calculate ratio to find the point, using the math formula / equation with the coordinates of the points
     // (Couldn't find the intersection using CGAL vectors)
+    // Added this check later : just in case, to avoid division by zero
+    if (length_a + length_b == 0) {
+        return std::make_pair(Point(NAN, NAN), -1);
+    }
     double ratio_a = length_a / (length_a + length_b);
     double ratio_b = length_b / (length_a + length_b);
 
@@ -267,18 +313,26 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
         int diry = 1;
         double x,y;
         if (p2.x() == p1.x()) { // if line equation is: x=b
+            // x = CGAL::to_double(p1.x());
+            // y = CGAL::to_double(p0.y());
             x = p1.x();
             y = p0.y();
         }
         else if (p2.y() == p1.y()) { // if line equation in y=b
+            // x = CGAL::to_double(p0.x());
+            // y = CGAL::to_double(p1.y());
             x = p0.x();
             y = p1.y();
         }
         else {
             // calculate line equations
-            double slope = (p2.y() - p1.y())/(p2.x() - p1.x());
+            // double slope = (CGAL::to_double(p2.y()) - (CGAL::to_double(p1.y())))/(CGAL::to_double(p2.x()) -(CGAL::to_double(p1.x())));
+            double slope = p2.y() - p1.y()/p2.x() - p1.x();
             double slope_per = -1/slope;
 
+            // double b = CGAL::to_double(p1.y()) - slope * CGAL::to_double(p1.x());
+            // double b_per = CGAL::to_double(p0.y()) - slope_per * CGAL::to_double(p0.x());
+            
             double b = p1.y() - slope * p1.x();
             double b_per = p0.y() - slope_per * p0.x();
 
@@ -290,6 +344,8 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
             // find direction for each coordinate:
             dirx = (x - p0.x()) / abs(x - p0.x());
             diry = (y - p0.y()) / abs(y - p0.y());
+            // dirx = (CGAL::to_double(x) - CGAL::to_double(p0.x())) / abs(CGAL::to_double(x) - CGAL::to_double(p0.x()));
+            // diry = (CGAL::to_double(y) - CGAL::to_double(p0.y())) / abs(CGAL::to_double(y) - CGAL::to_double(p0.y()));
             // add apropriate number to extend
             x += dirx * 1 * mult;
             y += diry * abs(slope_per) * mult;
@@ -419,29 +475,83 @@ void PSLG::flip_edges(CDT *cdt) {
     std::cout << "Edges fliped are: " << flip_vec.size() << std::endl;
 }
 
+// std::string fraction_converter(double n) {
+//     // int max = 10000;
 
-std::string fraction_converter(double n) {
-    // int max = 10000;
+//     // if (n == 0.0) return "0";
 
-    // if (n == 0.0) return "0";
+//     // int sign = (n < 0) ? -1 : 1;
+//     // n = std::fabs(n);
 
-    // int sign = (n < 0) ? -1 : 1;
-    // n = std::fabs(n);
+//     // // Find the closest fraction
+//     // int denominator = max;
+//     // int numerator = static_cast<int>(n * denominator);
 
-    // // Find the closest fraction
-    // int denominator = max;
-    // int numerator = static_cast<int>(n * denominator);
+//     // // Reduce the fraction using gcd
+//     // int gcd_value = std::gcd(numerator, denominator);
+//     // numerator /= gcd_value;
+//     // denominator /= gcd_value;
 
-    // // Reduce the fraction using gcd
-    // int gcd_value = std::gcd(numerator, denominator);
-    // numerator /= gcd_value;
-    // denominator /= gcd_value;
+//     // return std::to_string(sign * numerator) + "/" + std::to_string(denominator);
+// }
 
-    // return std::to_string(sign * numerator) + "/" + std::to_string(denominator);
-}
+// void print_rational(const K::FT& coord) {
+//     const auto exact_coord = CGAL::exact(coord);
+
+//     // Convert the exact coordinate to a GMP rational (mpq_t)
+//     const mpq_t* gmpq_ptr = reinterpret_cast(&exact_coord);
+
+//     // Declare GMP integers to hold the numerator and denominator
+//     mpz_t num, den;
+//     mpz_init(num);
+//     mpz_init(den);
+
+//     // Extract the numerator and denominator using GMP functions
+//     mpq_get_num(num, *gmpq_ptr);  // Get the numerator
+//     mpq_get_den(den, *gmpq_ptr);  // Get the denominator
+
+//     // Print the numerator and denominator
+//     gmp_printf("%Zd/%Zd\n", num, den);
+
+//     // Clear GMP integers
+//     mpz_clear(num);
+//     mpz_clear(den);
+// } 
+
+// std::string print_rational(const K::FT& coord) {
+//     const auto exact_coord = CGAL::exact(coord);
+
+//     // Convert the exact coordinate to a GMP rational (mpq_t)
+//     const mpq_t* gmpq_ptr = reinterpret_cast<const mpq_t*>(&exact_coord);
+
+//     // Declare GMP integers to hold the numerator and denominator
+//     mpz_t num, den;
+//     mpz_init(num);
+//     mpz_init(den);
+
+//     // Extract the numerator and denominator
+//     mpq_get_num(num, *gmpq_ptr); // Get the numerator
+//     mpq_get_den(den, *gmpq_ptr); // Get the denominator
+
+//     // Convert to string
+//     char* num_str = mpz_get_str(nullptr, 10, num);
+//     char* den_str = mpz_get_str(nullptr, 10, den);
+
+//     std::string fraction = std::string(num_str) + "/" + std::string(den_str);
+
+//     // Free GMP memory
+//     mpz_clear(num);
+//     mpz_clear(den);
+//     free(num_str);
+//     free(den_str);
+
+//     return fraction;
+// }
+
+
 
 // Function that produces the final .json output with the data as requested
-void PSLG::produce_output() {
+void PSLG::produce_output(CDT instance) {
     pt::ptree root;
     root.put("content_type", "CG_SHOP_2025_Solution");
     root.put("instance_uid", uid);
@@ -485,6 +595,18 @@ void PSLG::produce_output() {
     }
 
     root.add_child("edges", edges);
+
+    // // new class members
+    // int obtuse_count = is_obtuse_gen(&instance);
+    // root.put("obtuse_count", obtuse_count);
+    // root.put("method", method);
+
+    // pt::ptree partree;  // for the parameters
+    // for (const auto &param : parameters) {
+    //     partree.put(param.first, param.second);
+    // }
+    // root.add_child("parameters", partree);
+
 
     write_json("output.json", root);    // redirect output to a file 
 }
