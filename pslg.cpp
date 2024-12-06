@@ -3,7 +3,7 @@
 // Constructor
 PSLG::PSLG(std::string filename) {
     pt::ptree root;
-    pt:read_json(filename, root);
+    pt::read_json(filename, root);
 
     // Insert .json data into the corresponding class members
     uid = root.get<std::string>("instance_uid");

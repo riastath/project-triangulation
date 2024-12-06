@@ -35,7 +35,7 @@ endif()
 # Creating entries for target: project
 # ############################
 
-add_executable(project  ex.cpp pslg.cpp)
+add_executable(project  ex.cpp pslg.cpp opt_algorithms.cpp)
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS project )
 
 # Link the executable to CGAL and third-party libraries
