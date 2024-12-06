@@ -64,4 +64,9 @@
 
 
 
-added : triangle, circumcenter with checking? 
+// ΜΕΡΟΣ 2 ΤΗΣ ΕΡΓΑΣΙΑΣ
+
+- triangle
+- modifications in pslg
+- new file : optimization
+- ex.cpp and algorithm explanations
