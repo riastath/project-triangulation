@@ -1,13 +1,13 @@
 /****************************************************************************
 ** Resource object code
 **
-** Created by: The Resource Compiler for Qt version 5.12.8
+** Created by: The Resource Compiler for Qt version 5.15.3
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
 static const unsigned char qt_resource_data[] = {
-  // /home/maria/project1/icons/fit-page-32.png
+  // /home/gpnb/project/project1/icons/fit-page-32.png
   0x0,0x0,0x5,0x32,
   0x89,
   0x50,0x4e,0x47,0xd,0xa,0x1a,0xa,0x0,0x0,0x0,0xd,0x49,0x48,0x44,0x52,0x0,
@@ -94,7 +94,7 @@ static const unsigned char qt_resource_data[] = {
   0xc9,0x69,0x8a,0x94,0x84,0x22,0xa5,0x32,0x63,0xf,0x1a,0xfd,0x7,0xfa,0xd6,0x9e,
   0x29,0x1d,0x33,0x88,0x11,0x0,0x0,0x0,0x0,0x49,0x45,0x4e,0x44,0xae,0x42,0x60,
   0x82,
-    // /home/maria/project1/icons/inputPolyline.png
+    // /home/gpnb/project/project1/icons/inputPolyline.png
   0x0,0x0,0x7,0xe5,
   0x89,
   0x50,0x4e,0x47,0xd,0xa,0x1a,0xa,0x0,0x0,0x0,0xd,0x49,0x48,0x44,0x52,0x0,
@@ -224,7 +224,7 @@ static const unsigned char qt_resource_data[] = {
   0x98,0x5c,0x6e,0xa0,0xdb,0x7c,0xe4,0xc7,0xfa,0x88,0x12,0x28,0xf8,0x19,0x7f,0x0,
   0x24,0xf5,0x62,0x20,0xb,0x82,0x36,0x72,0x0,0x0,0x0,0x0,0x49,0x45,0x4e,0x44,
   0xae,0x42,0x60,0x82,
-    // /home/maria/project1/icons/inputPoint.png
+    // /home/gpnb/project/project1/icons/inputPoint.png
   0x0,0x0,0x4,0x79,
   0x89,
   0x50,0x4e,0x47,0xd,0xa,0x1a,0xa,0x0,0x0,0x0,0xd,0x49,0x48,0x44,0x52,0x0,
@@ -371,7 +371,6 @@ namespace QT_NAMESPACE {
 #endif
 
 bool qRegisterResourceData(int, const unsigned char *, const unsigned char *, const unsigned char *);
-
 bool qUnregisterResourceData(int, const unsigned char *, const unsigned char *, const unsigned char *);
 
 #ifdef QT_NAMESPACE
@@ -381,16 +380,18 @@ bool qUnregisterResourceData(int, const unsigned char *, const unsigned char *, 
 int QT_RCC_MANGLE_NAMESPACE(qInitResources_Input)();
 int QT_RCC_MANGLE_NAMESPACE(qInitResources_Input)()
 {
+    int version = 3;
     QT_RCC_PREPEND_NAMESPACE(qRegisterResourceData)
-        (0x2, qt_resource_struct, qt_resource_name, qt_resource_data);
+        (version, qt_resource_struct, qt_resource_name, qt_resource_data);
     return 1;
 }
 
 int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_Input)();
 int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_Input)()
 {
+    int version = 3;
     QT_RCC_PREPEND_NAMESPACE(qUnregisterResourceData)
-       (0x2, qt_resource_struct, qt_resource_name, qt_resource_data);
+       (version, qt_resource_struct, qt_resource_name, qt_resource_data);
     return 1;
 }
 

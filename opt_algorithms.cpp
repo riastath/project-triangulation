@@ -377,12 +377,12 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
                             point_choice = graph->insert_steiner_circumcenter(*cdt, it, num_obtuse).first; 
                             break;
                         default: 
-                            point_choice = std::make_pair(Point(NAN, NAN), -1).first;
+                            point_choice = std::make_pair(Point(NULL, NULL), -1).first;
                             break;
                     }
 
                     // if the steiner point chosen is valid
-                    if (!std::isnan(point_choice.x()) && !std::isnan(point_choice.y())) {
+                    if (!std::isnan(CGAL::to_double(point_choice.x())) && !std::isnan(CGAL::to_double(point_choice.y()))) {
                         ant_sol.push_back(point_choice);            
                     }           
                 }
