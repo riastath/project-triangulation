@@ -115,7 +115,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
                         result = graph->insert_steiner_circumcenter(*cdt, it, num_obtuse);
                         break;
                     default:
-                        result = std::make_pair(Point(NAN, NAN), -1);   // needed or returning simply?
+                        result = std::make_pair(Point(NAN, NAN), -1);
                         break;
                 }
 
@@ -148,7 +148,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
                     std::cout << "difference is negative and found new energy " << E << std::endl;
                 } else {                    // accept with probability 
                     double probability = exp(-delta / T);
-                    // calculate random number and compare, accepting or not. maybe this is not the right way to do it, though ...
+                    // calculate random number and compare, accepting or not
                     double rand_value = (double)rand() / RAND_MAX;
                     std::cout << "value (random) is " << rand_value << std::endl;
                     std::cout << "probability is " << probability << std::endl;
@@ -159,6 +159,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
                         E = new_energy;
                     } else { 
                         std::cout << "did not accept the new cdt with probability" << std::endl; 
+                        // break here?
                     }
                 }
 
@@ -167,7 +168,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
         }
 
         if (!new_steiner_points.empty()) {
-            for (Point& p: new_steiner_points) {
+            for (const Point& p: new_steiner_points) {
                 cdt->insert(p);
             }
         } 
@@ -181,7 +182,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
         T = T - (1.0/max_iterations);           // assume they're positive, here
         std::cout << "new temperature is : " << T << std::endl;
 
-        if (T < 0 ) break;                      // possibly redundant
+        if (T < 0 ) break;  // just in case
     }
 }
 
@@ -236,7 +237,7 @@ double compute_r(CDT::Finite_faces_iterator it) {
     double s = (length_a + length_b + length_c) / 2.0;                              // the semi perimeter
     double area = std::sqrt(s * (s - length_a) * (s - length_b) * (s - length_c));  // calculated with heron's formula A=sqrt(s⋅(s−a)⋅(s−b)⋅(s−c))
     if (area == 0) {
-        return -1.0; // invalid
+        return -1.0;
     }
 
     double height = (2.0 * area) / longest;
@@ -249,7 +250,6 @@ double compute_r(CDT::Finite_faces_iterator it) {
 
 // Helper function for ant colony : pheromone updates
 // differences vector is Δτsp​=1/(1+α⋅obtuse count+β⋅Steiner count) ​if the option improves the triangulation. 0, otherwise.​
-// they will be calculated beforehand
 // evaporation rate is L, given by user 
 void update_pheromones(PSLG *graph, CDT *cdt, std::vector<double>& pheromones, double evaporation_rate, int num_obtuse, int num_steiner, double alpha, double beta, std::vector<std::vector<Point>>solutions) {
     std::vector<double> differences(5, 0.0);        // this is the Δτsp vector, which will be used to update pheromones
@@ -271,7 +271,7 @@ void update_pheromones(PSLG *graph, CDT *cdt, std::vector<double>& pheromones, d
             }
         }
 
-        // calculate the Δsp accordingly
+        // Calculate the Δsp accordingly
         std::cout << was_improved << std::endl;
         if (was_improved) {
             differences[i] = 1.0 / (1 + alpha * num_obtuse + beta * num_steiner);
@@ -303,10 +303,9 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
     int num_steiner = graph->get_num_steiner_points();
 
     // So we can find the best solution after each ant's solution
-    // This might not be the ideal way to compare them, but there were errors...
     int max_num_obtuse = std::numeric_limits<int>::max(); 
     int max_num_steiner = std::numeric_limits<int>::max();
-    std::vector<Point> new_steiner_vec; // pretty much like in simulated annealing, best steiner will be stored here
+    std::vector<Point> new_steiner_vec;     // pretty much like in simulated annealing, best steiner will be stored here
     
     for (int c = 1; c <= L; c++) {
         std::vector<std::vector<Point>> solutions(K); // for every ant in a certain cycle, a vector of solutions
@@ -354,12 +353,12 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
 
                     // Using discrete distribution to randomly generate a number to choose from
                     std::random_device rd;          // seed for random number   
-                    std::mt19937 generator(rd());   // found this method online
+                    std::mt19937 generator(rd());
                     std::discrete_distribution<int> distribution(probabilities.begin(), probabilities.end());
                     int method_choice = distribution(generator);    // the steiner method for the ant
 
                     Point point_choice;                             // the steiner point for the ant
-                    // taking the point directly instead of using "result" variable because we don't need the improvement
+                    // Taking the point directly instead of using "result" variable because we don't need the improvement
                     switch (method_choice) {
                         case 0: 
                             point_choice = graph->insert_steiner_center(*cdt, it, num_obtuse).first; 
@@ -381,7 +380,7 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
                             break;
                     }
 
-                    // if the steiner point chosen is valid
+                    // If the steiner point chosen is valid
                     if (!std::isnan(CGAL::to_double(point_choice.x())) && !std::isnan(CGAL::to_double(point_choice.y()))) {
                         ant_sol.push_back(point_choice);            
                     }           
@@ -407,15 +406,16 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
             }
         }
 
-        // finally, insert the vector into the cdt, accepting the current configuration as the best one
+        // Finally, insert the vector into the cdt, accepting the current configuration as the best one
         if (!new_steiner_vec.empty()) {
             for (Point& point : new_steiner_vec) {
                 cdt->insert(point);
             }
         }
 
-        // update pheromones
+        // Update pheromones for next cycle
         update_pheromones(graph, cdt, pheromones, lambda, num_obtuse, num_steiner, alpha, beta, solutions);
+
         std::cout << "-----------------UPDATED PHEROMONES----------------" << std::endl;
         print_pheromones(pheromones);
 

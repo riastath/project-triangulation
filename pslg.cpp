@@ -24,12 +24,12 @@ PSLG::PSLG(std::string filename) {
         points_y.push_back(y.second.get_value<int>());
     }
 
-    // create vector with graph points
+    // Create vector with graph points
     for (int i = 0; i < points_x.size(); i++) {
         point_vec.push_back(Point(points_x.at(i), points_y.at(i)));
     }
 
-    // add constraints
+    // Add constraints
     for (pt::ptree::value_type &add : root.get_child("additional_constraints")) {
         int graph_edge[2];
         int x = 0;
@@ -42,31 +42,39 @@ PSLG::PSLG(std::string filename) {
         additional_constraints.push_back(constr);
     }
 
-    // // new parameters added for part 2 : method, etc.
-    // method = root.get<std::string>("method");
-    // delaunay = root.get<bool>("delaunay");
+    // New parameters added for part 2 : method, delaunay flag, parameters of algorithm
+    method = root.get<std::string>("method");
+    delaunay = root.get<bool>("delaunay");
 
-    // // parameters will be different for each algorithm
-    // for (const auto &param : root.get_child("parameters")) {
-    //     parameters[param.first] = param.second.get_value<double>();
-    // }
+    // Parameters will be different for each algorithm
+    for(pt::ptree::value_type &param : root.get_child("parameters")) {
+        parameters[param.first] = param.second.get_value<double>();
+    }
 
 }
 
+// Returns the cdt after inserting (steiner) point
 CDT PSLG::return_cdt(CDT cdt, Point point) {
     cdt.insert(point);
     return cdt;
 }
 
-// getters (if needed)
+// Getter functions
 int PSLG::get_num_steiner_points() {
     return steiner_points.size();
 }
 
-// std::string PSLG::get_method() {
-//     return method;
-// }
+std::string PSLG::get_method() {
+    return method;
+}
 
+std::map<std::string, double> PSLG::get_parameters() {
+    return parameters;
+}
+
+bool PSLG::get_delaunay_flag() {
+    return delaunay;
+}
 
 // To pass all points and edges to the delaunay triangulation instance
 void PSLG::delaunay_passer(CDT* delaunay_instance) {
@@ -87,9 +95,7 @@ double PSLG::angle(Point a, Point b, Point c) {
     // calculating the vectors needed for the dot product formula
     Vector u = b - a;
     Vector v = c - a;
-
     
-    // double product = u * v;
     K::FT prod = u * v;
     double product = CGAL::to_double(prod);
     // |u| and |v|. no length function exists, so using square length and taking its root
@@ -662,7 +668,7 @@ std::pair<Point, int> PSLG::insert_steiner_circumcenter(CDT instance, CDT::Face_
     Point circumcenter = CGAL::circumcenter(a, b, c);
 
     Triangle triangle(a, b, c);
-    if (!triangle.has_on_bounded_side(circumcenter)) {  // checking if it's within boundaries?
+    if (!triangle.has_on_bounded_side(circumcenter)) {  // checking if it's within boundaries
         return std::make_pair(Point(NULL, NULL), -1);
     }
 
@@ -673,18 +679,6 @@ std::pair<Point, int> PSLG::insert_steiner_circumcenter(CDT instance, CDT::Face_
     int improvement = num_obtuse - num_after;
 
     return std::make_pair(circumcenter, improvement);
-
-    // old version without checking 
-
-    // Point circumcenter = CGAL::circumcenter(a, b, c);
-    // insert_all_steiner(&instance);
-    // instance.insert(circumcenter);
-    
-    // int num_after = is_obtuse_gen(&instance);
-    // int improvement = num_obtuse - num_after;
-
-    // return std::make_pair(circumcenter, improvement);
-    // also need to remove the edge like in centroid
 }
 
 void PSLG::insert_all_steiner(CDT *cdt) {
@@ -760,79 +754,6 @@ void PSLG::flip_edges(CDT *cdt) {
     
     std::cout << "Edges fliped are: " << flip_vec.size() << std::endl;
 }
-
-// std::string fraction_converter(double n) {
-//     // int max = 10000;
-
-//     // if (n == 0.0) return "0";
-
-//     // int sign = (n < 0) ? -1 : 1;
-//     // n = std::fabs(n);
-
-//     // // Find the closest fraction
-//     // int denominator = max;
-//     // int numerator = static_cast<int>(n * denominator);
-
-//     // // Reduce the fraction using gcd
-//     // int gcd_value = std::gcd(numerator, denominator);
-//     // numerator /= gcd_value;
-//     // denominator /= gcd_value;
-
-//     // return std::to_string(sign * numerator) + "/" + std::to_string(denominator);
-// }
-
-// void print_rational(const K::FT& coord) {
-//     const auto exact_coord = CGAL::exact(coord);
-
-//     // Convert the exact coordinate to a GMP rational (mpq_t)
-//     const mpq_t* gmpq_ptr = reinterpret_cast(&exact_coord);
-
-//     // Declare GMP integers to hold the numerator and denominator
-//     mpz_t num, den;
-//     mpz_init(num);
-//     mpz_init(den);
-
-//     // Extract the numerator and denominator using GMP functions
-//     mpq_get_num(num, *gmpq_ptr);  // Get the numerator
-//     mpq_get_den(den, *gmpq_ptr);  // Get the denominator
-
-//     // Print the numerator and denominator
-//     gmp_printf("%Zd/%Zd\n", num, den);
-
-//     // Clear GMP integers
-//     mpz_clear(num);
-//     mpz_clear(den);
-// } 
-
-// std::string print_rational(const K::FT& coord) {
-//     const auto exact_coord = CGAL::exact(coord);
-
-//     // Convert the exact coordinate to a GMP rational (mpq_t)
-//     const mpq_t* gmpq_ptr = reinterpret_cast<const mpq_t*>(&exact_coord);
-
-//     // Declare GMP integers to hold the numerator and denominator
-//     mpz_t num, den;
-//     mpz_init(num);
-//     mpz_init(den);
-
-//     // Extract the numerator and denominator
-//     mpq_get_num(num, *gmpq_ptr); // Get the numerator
-//     mpq_get_den(den, *gmpq_ptr); // Get the denominator
-
-//     // Convert to string
-//     char* num_str = mpz_get_str(nullptr, 10, num);
-//     char* den_str = mpz_get_str(nullptr, 10, den);
-
-//     std::string fraction = std::string(num_str) + "/" + std::string(den_str);
-
-//     // Free GMP memory
-//     mpz_clear(num);
-//     mpz_clear(den);
-//     free(num_str);
-//     free(den_str);
-
-//     return fraction;
-// }
 
 void print_rational(const K::FT& coord, unsigned long* a, unsigned long* b) {
     const auto exact_coord = CGAL::exact(coord);
@@ -910,17 +831,16 @@ void PSLG::produce_output(CDT instance) {
 
     root.add_child("edges", edges);
 
-    // // new class members
-    // int obtuse_count = is_obtuse_gen(&instance);
-    // root.put("obtuse_count", obtuse_count);
-    // root.put("method", method);
+    // New class members, adding to output
+    int obtuse_count = is_obtuse_gen(&instance);
+    root.put("obtuse_count", obtuse_count);
+    root.put("method", method);;
 
-    // pt::ptree partree;  // for the parameters
-    // for (const auto &param : parameters) {
-    //     partree.put(param.first, param.second);
-    // }
-    // root.add_child("parameters", partree);
-
+    pt::ptree param_tree;                  // for the parameters
+    for (std::pair<const std::string, double> &param : parameters) {
+        param_tree.put(param.first, param.second);
+    }
+    root.add_child("parameters", param_tree);
 
     write_json("output.json", root);    // redirect output to a file 
 }

@@ -8,7 +8,6 @@
 #include <typeinfo>
 #include <CGAL/Constrained_Delaunay_triangulation_2.h>
 #include <CGAL/draw_triangulation_2.h>
-// #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Vector_2.h>                                      // used for angle calculation
 #include <CGAL/Triangle_2.h>
@@ -21,7 +20,6 @@
 // for json parsing, reading and writing
 namespace pt = boost::property_tree;
 
-// typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Exact_predicates_exact_constructions_kernel K;
 typedef CGAL::Exact_predicates_tag Itag;
 typedef CGAL::Constrained_Delaunay_triangulation_2<K, CGAL::Default, Itag> CDT;
@@ -41,21 +39,26 @@ private:
     std::vector<int> points_y;
     std::vector<Point> point_vec;
     std::vector<std::pair<Point, Point>> additional_constraints;
-    std::vector<Point> steiner_points;  // to insert the steiner points
+    std::vector<Point> steiner_points;          // to insert the steiner points
     int num_points;
     int num_constraints;
 
-    // // new members for part 2 
-    // std::string method; // the algorithm selected
-    // std::map<std::string, double> parameters; // for each algorithm
-    // bool delaunay; // a flag to know if we should start with delaunay or not 
-    // int obtuse_count = 0; // maybe
+    // New members for part 2 
+    std::string method;                             // the algorithm selected
+    std::map<std::string, double> parameters;       // for each algorithm
+    bool delaunay;                                  // a flag to know if we should start with delaunay or not 
 
 public:
     PSLG(std::string filename);         // constructor
 
     CDT return_cdt(CDT cdt, Point point);
 
+    // Getter functions
+    int get_num_steiner_points();
+    std::string get_method();
+    std::map<std::string, double> get_parameters();
+    bool get_delaunay_flag();
+    
     // Helper functions
     void delaunay_passer(CDT* delaunay_instance);
     void produce_output(CDT instance);
@@ -80,10 +83,4 @@ public:
     // Edge flipping functions
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);
     void flip_edges(CDT *cdt);
-
-    // // new
-    int get_num_steiner_points();
-    // std::string get_method();
-    // std::pair<Point, int> random_steiner_select(CDT* instance, int num_obtuse); 
-    
 };

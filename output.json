@@ -1,7 +1,12 @@
 {
     "content_type": "CG_SHOP_2025_Solution",
-    "instance_uid": "test_6",
+    "instance_uid": "simple_polygon",
     "steiner_points_x": "",
     "steiner_points_y": "",
-    "edges": ""
+    "edges": "",
+    "obtuse_count": "0",
+    "method": "local",
+    "parameters": {
+        "L": "50"
+    }
 }

@@ -6,5 +6,10 @@
     "region_boundary": [0,1,2,3],
     "num_constraints": 11,
     "additional_constraints": [
-    ]
+    ],
+    "method": "local",
+    "parameters": {
+        "L": 50
+    },
+    "delaunay": true
 }
