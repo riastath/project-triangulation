@@ -37,7 +37,6 @@ int main(int argc, char *argv[]) {
     std::string method = graph->get_method();
     std::map<std::string, double> params = graph->get_parameters();
 
-
     // Only do delaunay if specified in parameters
     if (delaunay_flag) {
         graph->delaunay_passer(&cdt);

@@ -51,8 +51,6 @@ private:
 public:
     PSLG(std::string filename);         // constructor
 
-    CDT return_cdt(CDT cdt, Point point);
-
     // Getter functions
     int get_num_steiner_points();
     std::string get_method();
@@ -62,6 +60,8 @@ public:
     // Helper functions
     void delaunay_passer(CDT* delaunay_instance);
     void produce_output(CDT instance);
+    CDT return_cdt(CDT cdt, Point point);
+
 
     // Obtuse checking functions
     double angle(Point a, Point b, Point c);

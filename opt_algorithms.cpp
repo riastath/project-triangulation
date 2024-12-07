@@ -122,7 +122,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
 
                 // Save the inserted steiner point to check for improvement
                 Point steiner = result.first;
-                std::cout << "Steiner point: (" << steiner.x() << ", " << steiner.y() << ")" << std::endl;
+                // std::cout << "Steiner point: (" << steiner.x() << ", " << steiner.y() << ")" << std::endl;
 
                 // Skip nan (invalid) points
                 double new_x = CGAL::to_double(steiner.x());
@@ -136,29 +136,25 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
                 double new_energy = energy(graph, &new_cdt, alpha, beta);
                 double delta = new_energy - E;
 
-                std::cout << "-----------------------" << std::endl;
-                std::cout << "delta is " << delta << std::endl;
+                // std::cout << "-----------------------" << std::endl;
+                // std::cout << "delta is " << delta << std::endl;
 
 
                 if (delta < 0) {                // if difference is negative, accept new configuration
-                    std::cout << "difference in energy is negative " << std::endl;
+                    // std::cout << "Difference in energy is negative " << std::endl;
                     new_steiner_points.push_back(steiner);
                     E = new_energy;
-                    std::cout << "-----------------------" << std::endl;
-                    std::cout << "difference is negative and found new energy " << E << std::endl;
                 } else {                    // accept with probability 
                     double probability = exp(-delta / T);
                     // calculate random number and compare, accepting or not
                     double rand_value = (double)rand() / RAND_MAX;
-                    std::cout << "value (random) is " << rand_value << std::endl;
-                    std::cout << "probability is " << probability << std::endl;
         
                     if (rand_value < probability) {
-                        std::cout << "accepted the new cdt with probability." << std::endl;
+                        std::cout << "Accepted the new cdt with probability." << std::endl;
                         new_steiner_points.push_back(steiner);
                         E = new_energy;
                     } else { 
-                        std::cout << "did not accept the new cdt with probability" << std::endl; 
+                        std::cout << "Did not accept the new cdt with probability" << std::endl; 
                         // break here?
                     }
                 }
@@ -180,7 +176,6 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
 
         // decrease temperature with formula given
         T = T - (1.0/max_iterations);           // assume they're positive, here
-        std::cout << "new temperature is : " << T << std::endl;
 
         if (T < 0 ) break;  // just in case
     }
@@ -280,11 +275,6 @@ void update_pheromones(PSLG *graph, CDT *cdt, std::vector<double>& pheromones, d
         }
     }
 
-    // debugging
-    std::cout << "differences: ";
-    for (double diff : differences) std::cout << diff << " ";
-    // end of debugging
-
     // Update pheromones using Δsp
     for (int i = 0; i < pheromones.size(); i++) {
         pheromones[i] = (1.0 - evaporation_rate) * pheromones[i] + differences[i];
@@ -295,8 +285,8 @@ void update_pheromones(PSLG *graph, CDT *cdt, std::vector<double>& pheromones, d
 void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, double y, int K, int L, double lambda) {
     std::vector<double> pheromones(5, 1.0);         // 1.0 is the starter value t_0, which must be higher than 0, initializing for every steiner option
 
-    std::cout << "-----------------STARTER PHEROMONES----------------" << std::endl;
-    print_pheromones(pheromones);
+    // std::cout << "-----------------STARTER PHEROMONES----------------" << std::endl;
+    // print_pheromones(pheromones);
 
     // Keeping the initial steiner point number to check for improvements later
     int num_obtuse = graph->is_obtuse_gen(cdt);
@@ -416,8 +406,8 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
         // Update pheromones for next cycle
         update_pheromones(graph, cdt, pheromones, lambda, num_obtuse, num_steiner, alpha, beta, solutions);
 
-        std::cout << "-----------------UPDATED PHEROMONES----------------" << std::endl;
-        print_pheromones(pheromones);
+        // std::cout << "-----------------UPDATED PHEROMONES----------------" << std::endl;
+        // print_pheromones(pheromones);
 
     }   
 }

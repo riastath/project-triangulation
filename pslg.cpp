@@ -109,7 +109,6 @@ double PSLG::angle(Point a, Point b, Point c) {
 
     // check angle's degrees. formula given an angle is degrees = angle * 180/pi
     double degrees = angle * (180/M_PI);
-    // double degrees = 91;
     return degrees;
 }
 
@@ -563,8 +562,6 @@ std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_han
     // Use CGAL'S squared distance, instead of squared_length for vectors, because now we're using the vertex and points 
     length_a = std::sqrt(CGAL::to_double(CGAL::squared_distance(obtuse_vertex, p_a)));
     length_b = std::sqrt(CGAL::to_double(CGAL::squared_distance(obtuse_vertex, p_b)));
-    // length_a = std::sqrt(CGAL::to_double(CGAL::squared_distance(obtuse_vertex, p_a)));
-    // length_b = std::sqrt(CGAL::to_double(CGAL::squared_distance(obtuse_vertex, p_b)));
 
     // Calculate ratio to find the point, using the math formula / equation with the coordinates of the points
     // (Couldn't find the intersection using CGAL vectors)
@@ -605,25 +602,18 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
         int diry = 1;
         double x,y;
         if (p2.x() == p1.x()) { // if line equation is: x=b
-            // x = CGAL::to_double(p1.x());
-            // y = CGAL::to_double(p0.y());
             x = CGAL::to_double(p1.x());
             y = CGAL::to_double(p0.y());
         }
         else if (p2.y() == p1.y()) { // if line equation in y=b
-            // x = CGAL::to_double(p0.x());
-            // y = CGAL::to_double(p1.y());
             x = CGAL::to_double(p0.x());
             y = CGAL::to_double(p1.y());
         }
         else {
             // calculate line equations
-            // double slope = (CGAL::to_double(p2.y()) - (CGAL::to_double(p1.y())))/(CGAL::to_double(p2.x()) -(CGAL::to_double(p1.x())));
             double slope = (CGAL::to_double(p2.y()) - CGAL::to_double(p1.y()))/CGAL::to_double((p2.x()) - CGAL::to_double(p1.x()));
             double slope_per = -1/slope;
 
-            // double b = CGAL::to_double(p1.y()) - slope * CGAL::to_double(p1.x());
-            // double b_per = CGAL::to_double(p0.y()) - slope_per * CGAL::to_double(p0.x());
             
             double b = CGAL::to_double(p1.y()) - slope * CGAL::to_double(p1.x());
             double b_per = CGAL::to_double(p0.y()) - slope_per * CGAL::to_double(p0.x());
@@ -636,8 +626,6 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
             // find direction for each coordinate:
             dirx = (x - CGAL::to_double(p0.x())) / abs(x - CGAL::to_double(p0.x()));
             diry = (y - CGAL::to_double(p0.y())) / abs(y - CGAL::to_double(p0.y()));
-            // dirx = (CGAL::to_double(x) - CGAL::to_double(p0.x())) / abs(CGAL::to_double(x) - CGAL::to_double(p0.x()));
-            // diry = (CGAL::to_double(y) - CGAL::to_double(p0.y())) / abs(CGAL::to_double(y) - CGAL::to_double(p0.y()));
             // add apropriate number to extend
             x += dirx * 1 * mult;
             y += diry * abs(slope_per) * mult;
