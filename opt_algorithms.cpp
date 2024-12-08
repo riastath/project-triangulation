@@ -55,7 +55,7 @@ void local_search(PSLG *graph, CDT_C *cdt, int L) {
         } 
 
         if (inserted <= 0) {
-            std::cout << "No more improvements can be made" << std::endl;
+            // std::cout << "No more improvements can be made" << std::endl;
             break;
         }
 
@@ -63,8 +63,8 @@ void local_search(PSLG *graph, CDT_C *cdt, int L) {
         iterations++;
     }
 
-    std::cout << "Iterations were : " << iterations << std::endl;
-    std::cout << "Final number of obtuse angles is currently: " << graph->is_obtuse_gen(cdt) << std::endl;
+    // std::cout << "Iterations were : " << iterations << std::endl;
+    // std::cout << "Final number of obtuse angles is currently: " << graph->is_obtuse_gen(cdt) << std::endl;
 }
 
 
@@ -122,7 +122,6 @@ void simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int
 
                 // Save the inserted steiner point to check for improvement
                 Point steiner = result.first;
-                // std::cout << "Steiner point: (" << steiner.x() << ", " << steiner.y() << ")" << std::endl;
 
                 // Skip nan (invalid) points
                 double new_x = CGAL::to_double(steiner.x());
@@ -136,12 +135,9 @@ void simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int
                 double new_energy = energy(graph, &new_cdt, alpha, beta);
                 double delta = new_energy - E;
 
-                // std::cout << "-----------------------" << std::endl;
-                // std::cout << "delta is " << delta << std::endl;
 
 
                 if (delta < 0) {                // if difference is negative, accept new configuration
-                    // std::cout << "Difference in energy is negative " << std::endl;
                     new_steiner_points.push_back(steiner);
                     graph->insert_steiner_point(steiner);
                     E = new_energy;
@@ -151,13 +147,9 @@ void simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int
                     double rand_value = (double)rand() / RAND_MAX;
         
                     if (rand_value < probability) {
-                        std::cout << "Accepted the new cdt with probability." << std::endl;
                         new_steiner_points.push_back(steiner);
                         graph->insert_steiner_point(steiner);
                         E = new_energy;
-                    } else { 
-                        // std::cout << "Did not accept the new cdt with probability" << std::endl; 
-                        // break here?
                     }
                 }
 
@@ -269,7 +261,7 @@ void update_pheromones(PSLG *graph, CDT_C *cdt, std::vector<double>& pheromones,
         }
 
         // Calculate the Δsp accordingly
-        std::cout << was_improved << std::endl;
+        // std::cout << was_improved << std::endl;
         if (was_improved) {
             differences[i] = 1.0 / (1 + alpha * num_obtuse + beta * num_steiner);
         } else { 
