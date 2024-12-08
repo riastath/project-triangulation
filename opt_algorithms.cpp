@@ -1,7 +1,7 @@
 #include "opt_algorithms.hpp"
 
 // Optimization algorithm 1 : local search
-void local_search(PSLG *graph, CDT *cdt, int L) {
+void local_search(PSLG *graph, CDT_C *cdt, int L) {
     int iterations = 0;
 
     while (iterations < L) {
@@ -16,7 +16,7 @@ void local_search(PSLG *graph, CDT *cdt, int L) {
             max_improvement = -1;
 
             // Check steiner methods and compare improvement value
-            result = graph->insert_steiner_center(*cdt, it, num_obtuse);
+            result = graph->insert_steiner_center_single(*cdt, it, num_obtuse);
             if (max_improvement < result.second) {
                 max_improvement = result.second;
                 max_pair = result;
@@ -79,7 +79,7 @@ double energy(PSLG *graph, CDT *cdt, double alpha, double beta) {
 }
 
 
-void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int max_iterations) {
+void simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int max_iterations) {
     double E = energy(graph, cdt, alpha, beta); // starter energy
     double T = 1.0;                             // starter temperature
     std::pair<Point, int> max_pair;
@@ -100,7 +100,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
                 int choice = rand() % 5;
                 switch (choice) {
                     case 0:
-                        result = graph->insert_steiner_center(*cdt, it, num_obtuse);
+                        result = graph->insert_steiner_center_single(*cdt, it, num_obtuse);
                         break;
                     case 1:
                         result = graph->insert_steiner_mid(*cdt, it, num_obtuse);
@@ -127,7 +127,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
                 // Skip nan (invalid) points
                 double new_x = CGAL::to_double(steiner.x());
                 double new_y = CGAL::to_double(steiner.y());
-                if (std::isnan(new_x) || std::isnan(new_y)) {
+                if (steiner == Point(NULL, NULL)) {
                     continue;
                 }
 
@@ -143,6 +143,7 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
                 if (delta < 0) {                // if difference is negative, accept new configuration
                     // std::cout << "Difference in energy is negative " << std::endl;
                     new_steiner_points.push_back(steiner);
+                    graph->insert_steiner_point(steiner);
                     E = new_energy;
                 } else {                    // accept with probability 
                     double probability = exp(-delta / T);
@@ -152,9 +153,10 @@ void simulated_annealing(PSLG *graph, CDT *cdt, double alpha, double beta, int m
                     if (rand_value < probability) {
                         std::cout << "Accepted the new cdt with probability." << std::endl;
                         new_steiner_points.push_back(steiner);
+                        graph->insert_steiner_point(steiner);
                         E = new_energy;
                     } else { 
-                        std::cout << "Did not accept the new cdt with probability" << std::endl; 
+                        // std::cout << "Did not accept the new cdt with probability" << std::endl; 
                         // break here?
                     }
                 }
@@ -246,7 +248,7 @@ double compute_r(CDT::Finite_faces_iterator it) {
 // Helper function for ant colony : pheromone updates
 // differences vector is Δτsp​=1/(1+α⋅obtuse count+β⋅Steiner count) ​if the option improves the triangulation. 0, otherwise.​
 // evaporation rate is L, given by user 
-void update_pheromones(PSLG *graph, CDT *cdt, std::vector<double>& pheromones, double evaporation_rate, int num_obtuse, int num_steiner, double alpha, double beta, std::vector<std::vector<Point>>solutions) {
+void update_pheromones(PSLG *graph, CDT_C *cdt, std::vector<double>& pheromones, double evaporation_rate, int num_obtuse, int num_steiner, double alpha, double beta, std::vector<std::vector<Point>>solutions) {
     std::vector<double> differences(5, 0.0);        // this is the Δτsp vector, which will be used to update pheromones
 
     // Before updating the pheromones, check if improvement was made
@@ -282,11 +284,8 @@ void update_pheromones(PSLG *graph, CDT *cdt, std::vector<double>& pheromones, d
 }
 
 // lambda : evaporation rate. K = number of ants, L = number of loops / cycles
-void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, double y, int K, int L, double lambda) {
+void ant_colony(PSLG *graph, CDT_C *cdt, double alpha, double beta, double x, double y, int K, int L, double lambda) {
     std::vector<double> pheromones(5, 1.0);         // 1.0 is the starter value t_0, which must be higher than 0, initializing for every steiner option
-
-    // std::cout << "-----------------STARTER PHEROMONES----------------" << std::endl;
-    // print_pheromones(pheromones);
 
     // Keeping the initial steiner point number to check for improvements later
     int num_obtuse = graph->is_obtuse_gen(cdt);
@@ -351,7 +350,7 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
                     // Taking the point directly instead of using "result" variable because we don't need the improvement
                     switch (method_choice) {
                         case 0: 
-                            point_choice = graph->insert_steiner_center(*cdt, it, num_obtuse).first; 
+                            point_choice = graph->insert_steiner_center_single(*cdt, it, num_obtuse).first; 
                             break;
                         case 1: 
                             point_choice = graph->insert_steiner_mid(*cdt, it, num_obtuse).first; 
@@ -371,7 +370,7 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
                     }
 
                     // If the steiner point chosen is valid
-                    if (!std::isnan(CGAL::to_double(point_choice.x())) && !std::isnan(CGAL::to_double(point_choice.y()))) {
+                    if (!(point_choice == Point(NULL, NULL))) {
                         ant_sol.push_back(point_choice);            
                     }           
                 }
@@ -399,15 +398,13 @@ void ant_colony(PSLG *graph, CDT *cdt, double alpha, double beta, double x, doub
         // Finally, insert the vector into the cdt, accepting the current configuration as the best one
         if (!new_steiner_vec.empty()) {
             for (Point& point : new_steiner_vec) {
+                graph->insert_steiner_point(point);
                 cdt->insert(point);
             }
         }
 
         // Update pheromones for next cycle
         update_pheromones(graph, cdt, pheromones, lambda, num_obtuse, num_steiner, alpha, beta, solutions);
-
-        // std::cout << "-----------------UPDATED PHEROMONES----------------" << std::endl;
-        // print_pheromones(pheromones);
 
     }   
 }

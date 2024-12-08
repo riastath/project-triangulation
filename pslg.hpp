@@ -40,6 +40,7 @@ private:
     std::vector<Point> point_vec;
     std::vector<std::pair<Point, Point>> additional_constraints;
     std::vector<Point> steiner_points;          // to insert the steiner points
+    std::vector<CDT_C> instances;
     int num_points;
     int num_constraints;
 
@@ -71,14 +72,14 @@ public:
 
     // Steiner point functions
     void insert_steiner_point(Point point);
-    void insert_all_steiner(CDT *cdt);
-    std::pair <Point, int> insert_steiner_center(CDT instance, CDT::Face_handle face, int num_obtuse);
-    std::pair <Point, int> insert_steiner_center_single(CDT instance, CDT::Face_handle face, int num_obtuse);
-    std::pair <Point, int> insert_steiner_center_neighbors(CDT_C* instance, CDT::Face_handle face, int num_obtuse);
-    std::pair <Point, int> insert_steiner_mid(CDT instance, CDT::Face_handle face, int num_obtuse);
-    std::pair <Point, int> insert_steiner_bisection(CDT instance, CDT::Face_handle face, int num_obtuse);
-    std::pair <Point, int> insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuse);
-    std::pair <Point, int> insert_steiner_circumcenter(CDT instance, CDT::Face_handle face, int num_obtuse);
+    void insert_all_steiner(CDT_C *cdt);
+    std::pair <Point, int> insert_steiner_center(CDT_C instance, CDT::Face_handle face, int num_obtuse);
+    std::pair <Point, int> insert_steiner_center_single(CDT_C instance, CDT::Face_handle face, int num_obtuse);
+    std::pair <CDT_C, Point> insert_steiner_center_neighbors(CDT_C instance, CDT::Face_handle face, int num_obtuse, int* res);
+    std::pair <Point, int> insert_steiner_mid(CDT_C instance, CDT::Face_handle face, int num_obtuse);
+    std::pair <Point, int> insert_steiner_bisection(CDT_C instance, CDT::Face_handle face, int num_obtuse);
+    std::pair <Point, int> insert_steiner_projection(CDT_C instance, CDT::Face_handle face, int num_obtuse);
+    std::pair <Point, int> insert_steiner_circumcenter(CDT_C instance, CDT::Face_handle face, int num_obtuse);
 
     // Edge flipping functions
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);

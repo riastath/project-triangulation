@@ -171,7 +171,7 @@ void PSLG::insert_steiner_point(Point point) {
 }
 
 // Steiner point method 1 : insert in center 
-std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle face, int num_obtuse) {
+std::pair<Point, int> PSLG::insert_steiner_center(CDT_C instance, CDT::Face_handle face, int num_obtuse) {
     Point extra;
     int i;
     bool found = false;
@@ -210,7 +210,7 @@ std::pair<Point, int> PSLG::insert_steiner_center(CDT instance, CDT::Face_handle
 }
 
 // Steiner point method 1.1 : insert in center, single triangle
-std::pair<Point, int> PSLG::insert_steiner_center_single(CDT instance, CDT::Face_handle face, int num_obtuce) {
+std::pair<Point, int> PSLG::insert_steiner_center_single(CDT_C instance, CDT::Face_handle face, int num_obtuce) {
     int i;
     bool found = false;
     for (i = 0; i < 3; i++) {
@@ -264,10 +264,8 @@ Point centroid_custom(std::vector<Point> points) {
 }
 
 // Steiner point method 1.2 : insert in center, check and include neighbors 
-// possible problem when changin neighbors: the main programm does not know not to change them again.
-std::pair<Point, int> PSLG::insert_steiner_center_neighbors(CDT_C* instance, CDT::Face_handle face, int num_obtuse) {
+std::pair<CDT_C, Point> PSLG::insert_steiner_center_neighbors(CDT_C instance, CDT::Face_handle face, int num_obtuse, int* res) {
 
-    // std::cout << "NULL point is: " << Point(NULL, NULL) << std::endl;
     Point polygon_points[6]; // 3 points for the triangle, and 3 more if we include all neighbors.
     for (int i = 0; i < 6; i++) {
         polygon_points[i] = Point(NULL, NULL);
@@ -285,10 +283,11 @@ std::pair<Point, int> PSLG::insert_steiner_center_neighbors(CDT_C* instance, CDT
         break;
     }
     if (found == false) {
-        return std::make_pair(Point(NULL, NULL), -1); // return this value if the function was unable to find the steiner point
+        *res = -1;
+        return std::make_pair(instance, Point(NULL, NULL)); // return if triangle is not obtuce
     }
     // insert the obtuce triangle's points to polygon points
-    polygon_points[0] = face->vertex(i)->point();
+    polygon_points[0] = face->vertex(i)->point(); // 0 is the obtuce angle
     polygon_points[1] = face->vertex((i+1)%3)->point();
     polygon_points[2] = face->vertex((i+2)%3)->point();
 
@@ -297,7 +296,7 @@ std::pair<Point, int> PSLG::insert_steiner_center_neighbors(CDT_C* instance, CDT
     CDT::Face_handle neigh;
     for (int j = 0; j < 3; j++) {
         neigh = face->neighbor(j);
-        // std::cout << "neighbor " << j << ":" << std::endl;
+
         // check the neighbor's points
         for (int k = 0; k < 3; k++) {
             // if common point: ignore
@@ -309,27 +308,16 @@ std::pair<Point, int> PSLG::insert_steiner_center_neighbors(CDT_C* instance, CDT
                 continue;
             }
             polygon_points[3+j] = neigh->vertex(k)->point();
-            // std::cout << "inserted: " << neigh->vertex(k)->point() << std::endl;
             break;
         }
     }
 
-
-    // // debugging debuggong
-    // for (int j = 0; j < 6; j++) {
-    //     std::cout << "Polygon point " << j << "is: " << polygon_points[j] << std::endl;
-    // }
-
-    // at this point, polygon_points should have all the polygon edges.
-
-    // insertion is tricky at this point
     
     // constraints logic
     /* if 3 not exists: 1-2, else: 1-3, 3-2
        if 4 not exists: 2-0, else: 2-4, 4-0
        if 5 not exists: 0-1, else: 0-5, 5-1*/
     // insert constraints
-    // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Point a, b, current;
     std::vector<std::pair<Point, Point>> constr_vec;
     for (int j = 3; j < 6; j++) {
@@ -338,124 +326,82 @@ std::pair<Point, int> PSLG::insert_steiner_center_neighbors(CDT_C* instance, CDT
         b = polygon_points[((j-2)%3 +1)%3];
         if (current == Point(NULL, NULL)) {
             // constraint a - b
-            // std::cout << "inserting constraint: " << (j-2)%3 << " - " << ((j-2)%3 +1)%3 << std::endl;
-            // instance->insert_constraint(a, b); // do i need face handles???
             constr_vec.push_back(std::make_pair(a, b));
         }
         else {
-            // std::cout << "inserting constraints: " << (j-2)%3 << " - " << j << ", and: " << j << " - " << ((j-2)%3 +1)%3 << std::endl;
-            // instance->insert_constraint(a, current);
-            // instance->insert_constraint(current, b);
-            constr_vec.push_back(std::make_pair(a, current));
-            constr_vec.push_back(std::make_pair(current, b));
             // constraint a - current
             // constraint current - b
+            constr_vec.push_back(std::make_pair(a, current));
+            constr_vec.push_back(std::make_pair(current, b));
         }
     }
 
-    // for debbuging, fix flip
-    // CDT::Face_handle it;
-    // it = instance->finite_faces_begin();
-    // instance->flip(it, 0);
+
     CDT::Face_handle it = face;
 
-    // remove points
+    // identify points to remove
     bool to_remove[6] = {false, false, false, false, false, false};
     for (int j = 3; j < 6; j++) {
         current = polygon_points[j];
         int a = (j-2)%3;
         int b = (a+1)%3;
         if (current != Point(NULL, NULL)) {
-            // remove vertex (point)
-            // std::cout << "Markig for removal: " << a << " and " << b << std::endl;
             to_remove[a] = true;
             to_remove[b] = true;
             to_remove[j] = true;
         }
     }
-    // // v1 (dependent of previous face handles)
-    // for (int j = 0; j < 3; j++) {
-    //     if (to_remove[(j+1)%3] && to_remove[(j+2)%3]) {
-    //         // instance.remove(face->vertex[])
-    //         int v = (i+j)%3; // i has stored the vertex in pos 0 of polygon_points.
-    //         int v1 = (v+1)%3;
-    //         int v2 = (v+2)%3;
-    //         instance->remove(face->vertex(v1));
-    //         instance->remove(face->vertex(v2));
-    //     }
-    // }
-    // v2 (independent of previous face handles) (VERY expensive in complexity) (and compared to prev, VERY UGLY)
+    // remove points
     int number_to_remove = 0;
     for (int j = 0; j < 6; j++) {
         if (to_remove[j] == true) {
             number_to_remove++;
         }
     }
-    std::vector<CDT::Vertex_handle> remove_vect; // i need vertex handles to remove points, and faces brake after every operation
+    std::vector<CDT::Vertex_handle> remove_vect; // we need vertex handles to remove points, and faces change after every operation
     CDT::Finite_faces_iterator temp_face;
-    for (temp_face = instance->finite_faces_begin(); temp_face != instance->finite_faces_end(); temp_face++) {
+    for (temp_face = instance.finite_faces_begin(); temp_face != instance.finite_faces_end(); temp_face++) {
         bool cont = false;
-        // int ident[3] = {-1, -1, -1};
-        // int num_ident = 0;
         for (int k = 0; k < 6; k++) {
             if (!to_remove[k]) {
                 continue;
             }
             Point temp_point = polygon_points[k];
             if (temp_face->vertex(0)->point() == temp_point) {
-                // ident[num_ident] = 0;
-                // num_ident++;
-                if (instance->are_there_incident_constraints(temp_face->vertex(0)) == false) {
+                if (instance.are_there_incident_constraints(temp_face->vertex(0)) == false) {
                     remove_vect.push_back(temp_face->vertex(0));
                 }
                 cont = true;
                 to_remove[k] = false;
             }
             else if (temp_face->vertex(1)->point() == temp_point) {
-                // ident[num_ident] = 1;
-                // num_ident++;
-                if (instance->are_there_incident_constraints(temp_face->vertex(1)) == false) {
+                if (instance.are_there_incident_constraints(temp_face->vertex(1)) == false) {
                     remove_vect.push_back(temp_face->vertex(1));
                 }
                 cont = true;
                 to_remove[k] = false;
             }
             else if (temp_face->vertex(2)->point() == temp_point) {
-                // ident[num_ident] = 2;
-                // num_ident++;
-                if (instance->are_there_incident_constraints(temp_face->vertex(2)) == false) {
+                if (instance.are_there_incident_constraints(temp_face->vertex(2)) == false) {
                     remove_vect.push_back(temp_face->vertex(2));
                 }
                 cont = true;
                 to_remove[k] = false;
             }
         }
-        // std::cout << "found " << remove_vect.size() << " removal points" << std::endl;
         if (cont == false) {
             continue;
         }
         if (remove_vect.size() == number_to_remove) {
             break;
         }
-        
-        // if (cont == false) {
-        //     continue;
-        // }
-        // int iter = 0;
-        // while (iter < num_ident) {
-        //     instance->remove(temp_face->vertex(ident[iter]));
-        //     iter++;
-        // }
-        // if (!(to_remove[0] || to_remove[1] || to_remove[2])) {
-        //     break;
-        // }
     }
     for (CDT::Vertex_handle vh : remove_vect) {
-        // std::cout << "removing point: " << vh->point() << std::endl;
-        instance->remove(vh); // ok, so apparently we cannot remove constrained edges
+        instance.remove(vh);
     }
     
 
+    // calculate centroid
     std::vector<Point> points;
     for (int j = 0; j < 6; j++) {
         if (polygon_points[j] == Point(NULL, NULL)) {
@@ -464,23 +410,24 @@ std::pair<Point, int> PSLG::insert_steiner_center_neighbors(CDT_C* instance, CDT
         points.push_back(polygon_points[j]);
     }
     Point center = centroid_custom(points);
-    // std::cout << "calculated steiner point: " << center << std::endl;
-    
-    instance->insert_no_flip(center);
+
+    // insert centroid    
+    instance.insert_no_flip(center);
 
 
+    // re-insert removed points in constraints
     for (std::pair<Point, Point> pconstr : constr_vec) {
-        instance->insert_constraint(pconstr.first, pconstr.second);
+        instance.insert_constraint(pconstr.first, pconstr.second);
     }
 
 
-
-    for (temp_face = instance->finite_faces_begin(); temp_face != instance->finite_faces_end(); temp_face++) {
+    // remove inserted constraints without removing their points
+    for (temp_face = instance.finite_faces_begin(); temp_face != instance.finite_faces_end(); temp_face++) {
         for (int k = 0; k < 3; k++) {
             for (int ve = 0; ve < constr_vec.size(); ve++) {
                 std::pair<Point, Point> pconstr = constr_vec.at(ve);
                 if ((pconstr.first == temp_face->vertex((k+1)%3)->point() && pconstr.second == temp_face->vertex((k+2)%3)->point())||(pconstr.first == temp_face->vertex((k+2)%3)->point() && pconstr.second == temp_face->vertex((k+1)%3)->point())) {
-                    instance->remove_constrained_edge(temp_face, k);
+                    instance.remove_constrained_edge(temp_face, k);
                     constr_vec.erase(constr_vec.begin() + ve);
                 }
             }
@@ -492,11 +439,14 @@ std::pair<Point, int> PSLG::insert_steiner_center_neighbors(CDT_C* instance, CDT
             break;
         }
     }
-    return std::make_pair(Point(NULL, NULL), -1);
+
+    int improvement = num_obtuse - is_obtuse_gen(&instance);
+    *res = improvement;
+    return std::make_pair(instance, center);
 }
 
 // Steiner point method 2 : insert midpoint
-std::pair<Point, int> PSLG::insert_steiner_mid(CDT instance, CDT::Face_handle face, int num_obtuse) {
+std::pair<Point, int> PSLG::insert_steiner_mid(CDT_C instance, CDT::Face_handle face, int num_obtuse) {
     Point a = face->vertex(0)->point();
     Point b = face->vertex(1)->point();
     Point c = face->vertex(2)->point();
@@ -527,7 +477,7 @@ std::pair<Point, int> PSLG::insert_steiner_mid(CDT instance, CDT::Face_handle fa
 }
 
 // Steiner point method 3 : insert a steiner point so that the obtuse angle is bisected
-std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_handle face, int num_obtuse) {
+std::pair<Point, int> PSLG::insert_steiner_bisection(CDT_C instance, CDT::Face_handle face, int num_obtuse) {
     Point a = face->vertex(0)->point();
     Point b = face->vertex(1)->point();
     Point c = face->vertex(2)->point();
@@ -584,7 +534,7 @@ std::pair<Point, int> PSLG::insert_steiner_bisection(CDT instance, CDT::Face_han
     return std::make_pair(bisection_point, improvement);
 }
 
-std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_handle face, int num_obtuse) {
+std::pair<Point, int> PSLG::insert_steiner_projection(CDT_C instance, CDT::Face_handle face, int num_obtuse) {
     Point projection_point;
     int improvement;
     bool found = false;
@@ -648,7 +598,7 @@ std::pair<Point, int> PSLG::insert_steiner_projection(CDT instance, CDT::Face_ha
     return std::make_pair(projection_point, improvement);
 }
 
-std::pair<Point, int> PSLG::insert_steiner_circumcenter(CDT instance, CDT::Face_handle face, int num_obtuse) {
+std::pair<Point, int> PSLG::insert_steiner_circumcenter(CDT_C instance, CDT::Face_handle face, int num_obtuse) {
     Point a = face->vertex(0)->point();
     Point b = face->vertex(1)->point();
     Point c = face->vertex(2)->point();
@@ -661,7 +611,7 @@ std::pair<Point, int> PSLG::insert_steiner_circumcenter(CDT instance, CDT::Face_
     }
 
     // circumcenter is valid
-    instance.insert(circumcenter);
+    instance.insert_no_flip(circumcenter);
 
     int num_after = is_obtuse_gen(&instance);
     int improvement = num_obtuse - num_after;
@@ -669,7 +619,7 @@ std::pair<Point, int> PSLG::insert_steiner_circumcenter(CDT instance, CDT::Face_
     return std::make_pair(circumcenter, improvement);
 }
 
-void PSLG::insert_all_steiner(CDT *cdt) {
+void PSLG::insert_all_steiner(CDT_C *cdt) {
     for (const Point& p: steiner_points) {
         cdt->insert(p);
     }
@@ -779,15 +729,27 @@ void PSLG::produce_output(CDT instance) {
     char ch[50];
 
     for (Point point : steiner_points) {
-
+        
         pt::ptree x_node, y_node;       // different nodes for each coordinate, to make the pairs with the empty string to insert
-
+        
         print_rational(point.x(), &a, &b);
-        sprintf(ch, "%lu/%lu", a, b);
-        x_node.put("", ch);
+        if (b == 1) {
+            x_node.put("", point.x());
+        }
+        else {
+            sprintf(ch, "%lu/%lu", a, b);
+            x_node.put("", ch);
+        }
+        
         print_rational(point.y(), &a, &b);
-        sprintf(ch, "%lu/%lu", a, b);
-        y_node.put("", point.y());
+        if (b == 1) {
+            y_node.put("", point.y());
+        }
+        else {
+            sprintf(ch, "%lu/%lu", a, b);
+            y_node.put("", ch);
+        }
+
 
         // this way, the points are shown as in the input .json files
         steiner_points_x.push_back(std::make_pair("", x_node));

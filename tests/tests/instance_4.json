@@ -53,5 +53,8 @@
             0,
             13
         ]
-    ]
+    ],
+    "method": "sa",
+    "parameters": {"alpha": 2.0, "beta": 5.0, "L": 50},
+    "delaunay": true
 }

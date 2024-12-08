@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     fclose(file);
 
     PSLG *graph = new PSLG(input_filename);
-    CDT cdt;
+    CDT_C cdt;
 
     bool delaunay_flag = graph->get_delaunay_flag();
     std::string method = graph->get_method();
