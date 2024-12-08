@@ -55,16 +55,13 @@ void local_search(PSLG *graph, CDT_C *cdt, int L) {
         } 
 
         if (inserted <= 0) {
-            // std::cout << "No more improvements can be made" << std::endl;
+            std::cout << "No more improvements can be made" << std::endl;
             break;
         }
 
         graph->insert_all_steiner(cdt);
         iterations++;
     }
-
-    // std::cout << "Iterations were : " << iterations << std::endl;
-    // std::cout << "Final number of obtuse angles is currently: " << graph->is_obtuse_gen(cdt) << std::endl;
 }
 
 
@@ -261,7 +258,6 @@ void update_pheromones(PSLG *graph, CDT_C *cdt, std::vector<double>& pheromones,
         }
 
         // Calculate the Δsp accordingly
-        // std::cout << was_improved << std::endl;
         if (was_improved) {
             differences[i] = 1.0 / (1 + alpha * num_obtuse + beta * num_steiner);
         } else { 
