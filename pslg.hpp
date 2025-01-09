@@ -72,6 +72,7 @@ public:
     bool is_obtuse(Point a, Point b, Point c);
     bool is_obtuse_face(CDT::Face_handle f);
     bool has_circles();
+    bool is_parallel_to_axes(const std::vector<int>& boundary_points);
     int is_obtuse_gen(CDT* instance);
 
     // Steiner point functions

@@ -44,6 +44,18 @@ PSLG::PSLG(std::string filename) {
 
     if (hull.size() != bounds.size()) {
         std::cout << "PSLG is not convex" << std::endl;
+
+        // ==== parallel start (because we check only if it's not convex)====
+
+        // check for the edges of the non-convex boundary here (parallel) ?
+        if (is_parallel_to_axes(bounds)) {
+            std::cout << "Edges are parallel to the axes (non-convex)" << std::endl;
+        } else {
+            std::cout << "Not all edges are parallel to the axes (non-convex)" << std::endl;
+        }
+        
+        // ==== parallel end ==== 
+
     }
     else {
         bool conv = true;
@@ -59,7 +71,6 @@ PSLG::PSLG(std::string filename) {
         }
     }
     // ====== convex hull end ======
-
 
 
     // Add constraints
@@ -84,6 +95,22 @@ PSLG::PSLG(std::string filename) {
         parameters[param.first] = param.second.get_value<double>();
     }
 
+}
+
+// Function to check if edges are parallel to axes
+bool PSLG::is_parallel_to_axes(const std::vector<int>& edge_points) {
+    for (int i = 0; i < edge_points.size(); i++) {
+        // We need to check all the edges
+        // Point vec has the graph points, so we use it. Get the first point of the edge, and the next one
+        Point p1 = point_vec[edge_points[i]];
+        Point p2 = point_vec[edge_points[(i + 1) % edge_points.size()]];  // go to the next point to check, practically loop around the edge
+        
+        // We need to check if this specific edge is horizontal or vertical : horizontal if same y, vertical if same x
+        if (!(p1.x() == p2.x() || p1.y() == p2.y())) {
+            return false; // edge is not parallel to y-axis or x-axis
+        }
+    }
+    return true; // this is true only if all edges looped are parallel to the axes
 }
 
 
