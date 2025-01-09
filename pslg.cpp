@@ -86,6 +86,19 @@ PSLG::PSLG(std::string filename) {
         additional_constraints.push_back(constr);
     }
 
+    
+
+    // check for closed constraints
+    bool has = has_circles();
+    if (has) {
+        std::cout << "Input has closed constraints" << std::endl;
+    }
+    else {
+        std::cout << "Input does not have closed constraints" << std::endl;
+    }
+
+
+
     // New parameters added for part 2 : method, delaunay flag, parameters of algorithm
     method = root.get<std::string>("method");
     delaunay = root.get<bool>("delaunay");
@@ -114,9 +127,66 @@ bool PSLG::is_parallel_to_axes(const std::vector<int>& edge_points) {
 }
 
 
-bool PSLG::has_circles() {
-    std::vector<Point> visited;
+bool rec_circlefinder(std::set<Point> &visited, std::set<Point> &check, std::vector<std::pair<Point, Point>> edges, Point current, std::set<std::pair<Point, Point>> &used_edge) {
+    if (visited.find(current) == visited.end()) { // not visited
+        visited.insert(current);
+        check.insert(current);
+
+        for (std::pair<Point, Point> &edge: edges) {
+            Point next;
+            if (used_edge.find(edge) != used_edge.end()) {
+                continue;
+            }
+            if (edge.first == current) {
+                next = edge.second;
+            } 
+            else if (edge.second == current) {
+                next = edge.first;
+            }
+            else {
+                continue;
+            }
+            used_edge.insert(edge);
+
+            if (visited.find(next) == visited.end()) {
+                // std::cout << next << " not in visited set" << std::endl;
+                return rec_circlefinder(visited, check, edges, next, used_edge);
+            }
+            else if (check.find(next) != check.end()) {
+                return true;
+            }
+        }
+    }
+    
+    check.erase(current);
+
     return false;
+}
+
+bool PSLG::has_circles() {
+    std::set<Point> visited;
+    std::set<Point> all;
+    std::set<Point> check;
+    std::set<std::pair<Point, Point>> used_edge;
+
+    for (std::pair<Point, Point> edge : additional_constraints) {
+        all.insert(edge.first);
+        all.insert(edge.second);
+    }
+    
+    bool res;
+
+    for (Point start : all) {
+        visited.clear();
+        check.clear();
+        used_edge.clear();
+        res = rec_circlefinder(visited, check, additional_constraints, start, used_edge);
+        if (res ==  true) {
+            return true;
+        }
+    }
+    
+    return res;
 }
 
 // Returns the cdt after inserting (steiner) point
