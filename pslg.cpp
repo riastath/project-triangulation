@@ -189,6 +189,57 @@ bool PSLG::has_circles() {
     return res;
 }
 
+// // Function to evaluate methods using convergence rate, p
+// double PSLG::compute_convergence_rate(CDT_C *cdt, int max_steiner_points) {
+//     int obtuse_before = is_obtuse_gen(cdt);
+//     double sum_convergence = 0.0;
+
+//     std::cout << "steiner_points size: " << steiner_points.size() << std::endl;
+//     std::cout << "max_steiner_points: " << max_steiner_points << std::endl;
+//     // for (int n = 1; n < max_steiner_points; n++) {
+//         // std::cout << steiner_points[n] << std::endl;
+//         // Point steiner_point = steiner_points[n]; // retrieve specific steiner point  
+//         // insert_steiner_point(steiner_point);
+        
+//         int obtuse_after = is_obtuse_gen(cdt);
+//         // no improvement -> skip this iteration
+//         if (obtuse_after == 0 || obtuse_before == 0) {
+//             continue;
+//         }
+        
+//         double p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(n + 1) / n);
+//         sum_convergence += p_n;
+//         obtuse_before = obtuse_after;   // for next iteration
+//     }
+
+//     // This is the average p that is requested
+//     return sum_convergence / (max_steiner_points - 1);
+// }
+
+// Function to evaluate methods using convergence rate, p
+double PSLG::compute_convergence_rate(CDT_C *cdt) {
+    int obtuse_before = is_obtuse_gen(cdt);
+    double sum_convergence = 0.0;
+
+    // n is # of steiner points and obtuse(n) is # of obtuse triangles after insertion of n steiner points
+    for (int n = 1; n < steiner_points.size(); n++) {
+        int obtuse_after = is_obtuse_gen(cdt);
+        // no improvement -> skip this iteration
+        if (obtuse_after == 0 || obtuse_before == 0) {
+            continue;
+        }
+        
+        double p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(n + 1) / n);
+        sum_convergence += p_n;
+        obtuse_before = obtuse_after;   // for next iteration, we need to recalculate the current # of obtuse
+    }
+
+    // This is the average p that is requested
+    return sum_convergence / (steiner_points.size() - 1);
+}
+
+
+
 // Returns the cdt after inserting (steiner) point
 CDT PSLG::return_cdt(CDT cdt, Point point) {
     cdt.insert(point);

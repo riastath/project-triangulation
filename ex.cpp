@@ -76,6 +76,15 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+
+    // New part added
+    double p = graph->compute_convergence_rate(&cdt);   // convergence rate
+
+    std::cout << "Average convergence rate p̅ is : " << p << std::endl;
+
+    // End of new part 
+
+
     std::cout << "After processing:" << std::endl;
     std::cout << "Obtuse angles are " << graph->is_obtuse_gen(&cdt) << std::endl;
 

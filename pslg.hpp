@@ -89,4 +89,8 @@ public:
     // Edge flipping functions
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);
     void flip_edges(CDT *cdt);
+
+    // double compute_convergence_rate(CDT_C *instance, int max_steiner_points);
+    double compute_convergence_rate(CDT_C *instance);
+
 };
