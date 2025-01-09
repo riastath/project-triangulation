@@ -14,7 +14,7 @@ PSLG::PSLG(std::string filename) {
     for (pt::ptree::value_type &bound : root.get_child("region_boundary")) {
         bounds.push_back(bound.second.get_value<int>());
     }
-
+    
     // Get coordinates
     for (pt::ptree::value_type &x : root.get_child("points_x")) {
         points_x.push_back(x.second.get_value<int>());
@@ -28,6 +28,39 @@ PSLG::PSLG(std::string filename) {
     for (int i = 0; i < points_x.size(); i++) {
         point_vec.push_back(Point(points_x.at(i), points_y.at(i)));
     }
+
+
+    // ====== convex hull start ======
+    std::vector<Point_2> hprev;
+
+    for (int &point: bounds) {
+        // std::cout << "point is:" << point_vec[point] << std::endl;
+        hprev.push_back(Point_2(point_vec[point].x(), point_vec[point].y()));
+    }
+
+    std::vector<Point_2> hull;
+    CGAL::convex_hull_2(hprev.begin(), hprev.end(), std::back_inserter(hull));
+    // std::cout << "convex hull points: " << hull.size() << std::endl;
+
+    if (hull.size() != bounds.size()) {
+        std::cout << "PSLG is not convex" << std::endl;
+    }
+    else {
+        bool conv = true;
+        for (int i = 0; i < hull.size(); i++) {
+            if (hull[i] != point_vec[bounds[i]]) {
+                std::cout << hull[i] << " != " << point_vec[bounds[i]] << std::endl;
+                conv = false;
+                break;
+            }
+        }
+        if (conv) {
+            std::cout << "is convex" << std::endl;
+        }
+    }
+    // ====== convex hull end ======
+
+
 
     // Add constraints
     for (pt::ptree::value_type &add : root.get_child("additional_constraints")) {
@@ -51,6 +84,12 @@ PSLG::PSLG(std::string filename) {
         parameters[param.first] = param.second.get_value<double>();
     }
 
+}
+
+
+bool PSLG::has_circles() {
+    std::vector<Point> visited;
+    return false;
 }
 
 // Returns the cdt after inserting (steiner) point

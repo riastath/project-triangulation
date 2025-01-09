@@ -12,6 +12,7 @@
 #include <CGAL/Vector_2.h>                                      // used for angle calculation
 #include <CGAL/Triangle_2.h>
 #include <CGAL/Polygon_2.h>
+#include <CGAL/convex_hull_2.h>
 
 #include <numeric> // for std::gcd -> output requirements
 
@@ -25,10 +26,12 @@ typedef CGAL::Exact_predicates_tag Itag;
 typedef CGAL::Constrained_Delaunay_triangulation_2<K, CGAL::Default, Itag> CDT;
 typedef Custom_Constrained_Delaunay_triangulation_2<K, CGAL::Default, Itag> CDT_C;
 typedef CDT::Point Point;
+typedef K::Point_2 Point_2;
 typedef CDT::Edge Edge;
 typedef K::Vector_2 Vector;
 
 typedef CGAL::Triangle_2<K> Triangle;
+
 
 // Class for the triangulation process, using delaunay and steiner methods as requested
 class PSLG {
@@ -68,6 +71,7 @@ public:
     double angle(Point a, Point b, Point c);
     bool is_obtuse(Point a, Point b, Point c);
     bool is_obtuse_face(CDT::Face_handle f);
+    bool has_circles();
     int is_obtuse_gen(CDT* instance);
 
     // Steiner point functions
