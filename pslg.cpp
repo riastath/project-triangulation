@@ -223,6 +223,7 @@ double PSLG::compute_convergence_rate(CDT_C *cdt) {
 
     // n is # of steiner points and obtuse(n) is # of obtuse triangles after insertion of n steiner points
     for (int n = 1; n < steiner_points.size(); n++) {
+        cdt->insert(steiner_points.at(n));
         int obtuse_after = is_obtuse_gen(cdt);
         // no improvement -> skip this iteration
         if (obtuse_after == 0 || obtuse_before == 0) {

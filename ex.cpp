@@ -32,6 +32,7 @@ int main(int argc, char *argv[]) {
 
     PSLG *graph = new PSLG(input_filename);
     CDT_C cdt;
+    CDT_C cdt_copy;
 
     bool delaunay_flag = graph->get_delaunay_flag();
     std::string method = graph->get_method();
@@ -40,6 +41,7 @@ int main(int argc, char *argv[]) {
     // Only do delaunay if specified in parameters
     if (delaunay_flag) {
         graph->delaunay_passer(&cdt);
+        graph->delaunay_passer(&cdt_copy);
     } else {
         std::cout << "Starting without delaunay." << std::endl;
     }
@@ -78,7 +80,7 @@ int main(int argc, char *argv[]) {
 
 
     // New part added
-    double p = graph->compute_convergence_rate(&cdt);   // convergence rate
+    double p = graph->compute_convergence_rate(&cdt_copy);   // convergence rate
 
     std::cout << "Average convergence rate p̅ is : " << p << std::endl;
 
