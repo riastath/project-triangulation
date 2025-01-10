@@ -1,8 +1,13 @@
 #include "opt_algorithms.hpp"
 
 // Optimization algorithm 1 : local search
-void local_search(PSLG *graph, CDT_C *cdt, int L) {
+double local_search(PSLG *graph, CDT_C *cdt, int L) {
     int iterations = 0;
+
+    // For convergence rate
+    int obtuse_before = graph->is_obtuse_gen(cdt);
+    double total_p_n = 0.0;
+    int convergence_insertions;
 
     while (iterations < L) {
         int inserted = 0;
@@ -52,6 +57,14 @@ void local_search(PSLG *graph, CDT_C *cdt, int L) {
 
             graph->insert_steiner_point(max_pair.first);    // insert steiner point picked
             inserted++;
+
+
+            int obtuse_after = graph->is_obtuse_gen(cdt);
+            int num_steiner = graph->get_num_steiner_points();
+            double p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(num_steiner + 1) / num_steiner);
+            convergence_insertions++;
+            total_p_n += p_n;
+            obtuse_before = obtuse_after;
         } 
 
         if (inserted <= 0) {
@@ -62,6 +75,17 @@ void local_search(PSLG *graph, CDT_C *cdt, int L) {
         graph->insert_all_steiner(cdt);
         iterations++;
     }
+
+
+    // p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(num_steiner + 1) / num_steiner);
+    // std::cout << "Convergence rate is: " << p_n << std::endl;
+    if (convergence_insertions > 0) {
+        total_p_n = total_p_n / convergence_insertions;
+    } else {
+        total_p_n = 0.0;
+    }
+
+    return total_p_n;
 }
 
 
@@ -76,9 +100,15 @@ double energy(PSLG *graph, CDT *cdt, double alpha, double beta) {
 }
 
 
-void simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int max_iterations) {
+double simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int max_iterations) {
     double E = energy(graph, cdt, alpha, beta); // starter energy
     double T = 1.0;                             // starter temperature
+
+    // For convergence rate
+    int obtuse_before = graph->is_obtuse_gen(cdt);
+    double total_p_n = 0.0;
+    int convergence_insertions = 0;
+
     std::pair<Point, int> max_pair;
     std::pair<Point, int> result;
 
@@ -138,6 +168,13 @@ void simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int
                     new_steiner_points.push_back(steiner);
                     graph->insert_steiner_point(steiner);
                     E = new_energy;
+
+                    int obtuse_after = graph->is_obtuse_gen(cdt);
+                    int num_steiner_after = graph->get_num_steiner_points();
+                    double p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(num_steiner_after + 1) / num_steiner_after);
+        	        total_p_n += p_n;
+                    convergence_insertions++;
+                    obtuse_before = obtuse_after;
                 } else {                    // accept with probability 
                     double probability = exp(-delta / T);
                     // calculate random number and compare, accepting or not
@@ -147,6 +184,14 @@ void simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int
                         new_steiner_points.push_back(steiner);
                         graph->insert_steiner_point(steiner);
                         E = new_energy;
+
+                        
+                        int obtuse_after = graph->is_obtuse_gen(cdt);
+                        int num_steiner_after = graph->get_num_steiner_points();
+                        double p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(num_steiner_after + 1) / num_steiner_after);
+                        total_p_n += p_n;
+                        convergence_insertions++;
+                        obtuse_before = obtuse_after;
                     }
                 }
 
@@ -170,6 +215,14 @@ void simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, int
 
         if (T < 0 ) break;  // just in case
     }
+
+    if (convergence_insertions > 0) {
+        total_p_n = total_p_n / convergence_insertions;
+    } else {
+        total_p_n = 0.0;
+    }
+
+    return total_p_n;
 }
 
 
@@ -272,12 +325,17 @@ void update_pheromones(PSLG *graph, CDT_C *cdt, std::vector<double>& pheromones,
 }
 
 // lambda : evaporation rate. K = number of ants, L = number of loops / cycles
-void ant_colony(PSLG *graph, CDT_C *cdt, double alpha, double beta, double x, double y, int K, int L, double lambda) {
+double ant_colony(PSLG *graph, CDT_C *cdt, double alpha, double beta, double x, double y, int K, int L, double lambda) {
     std::vector<double> pheromones(5, 1.0);         // 1.0 is the starter value t_0, which must be higher than 0, initializing for every steiner option
 
     // Keeping the initial steiner point number to check for improvements later
     int num_obtuse = graph->is_obtuse_gen(cdt);
     int num_steiner = graph->get_num_steiner_points();
+
+    // For convergence rate
+    int obtuse_before = graph->is_obtuse_gen(cdt);
+    double total_p_n = 0.0;
+    int convergence_insertions = 0;
 
     // So we can find the best solution after each ant's solution
     int max_num_obtuse = std::numeric_limits<int>::max(); 
@@ -388,11 +446,26 @@ void ant_colony(PSLG *graph, CDT_C *cdt, double alpha, double beta, double x, do
             for (Point& point : new_steiner_vec) {
                 graph->insert_steiner_point(point);
                 cdt->insert(point);
+
+                int obtuse_after = graph->is_obtuse_gen(cdt);
+                int num_steiner = graph->get_num_steiner_points();
+                double p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(num_steiner + 1) / num_steiner);
+                total_p_n += p_n;
+                convergence_insertions++;
+                obtuse_before = obtuse_after;
             }
         }
 
         // Update pheromones for next cycle
         update_pheromones(graph, cdt, pheromones, lambda, num_obtuse, num_steiner, alpha, beta, solutions);
 
-    }   
+    }
+
+   if (convergence_insertions > 0) {
+        total_p_n = total_p_n / convergence_insertions;
+    } else {
+        total_p_n = 0.0;
+    }
+
+    return total_p_n;
 }
