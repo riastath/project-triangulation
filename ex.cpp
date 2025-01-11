@@ -112,6 +112,7 @@
 //     return 0;
 // }
 
+// Like the method mentioned in e-class for randomization : gaussian distribution, based on the centroid of obtuse triangles
 Point random_point(Point centroid) {
     // Using gaussian normal distribution for two coordinates
     double deviation = 0.5; // random choice, can change
@@ -127,9 +128,6 @@ Point random_point(Point centroid) {
 
     return Point(random_x, random_y);   // the new random point
 }
-
-
-
 
 
 int main(int argc, char *argv[]) {
@@ -210,39 +208,42 @@ int main(int argc, char *argv[]) {
 
     // New part added
 
-    std::cout << "Average convergence rate p̅ is : " << p << std::endl;
+    std::cout << "Average convergence rate p is : " << p << std::endl;
 
     // Checking convergence
-    if (p < 0.1) {  // small rate -> better convergence
+    if (p < 0.0) {  // small rate -> better convergence
         std::cout << "Converged, using p " << std::endl;
-
-
     } else {    // big rate -> worse convergence
         std::cout << "Did not converge, using randomization " << std::endl;
-        // CDT::Finite_faces_iterator it;
-        // std::vector<CDT::Face_handle> obtuse_faces;
+        CDT::Finite_faces_iterator it;
+        std::vector<CDT::Face_handle> obtuse_faces;
 
-        // for (it = cdt.finite_faces_begin(); it != cdt.finite_faces_end(); it++) {
-        //     if (graph->is_obtuse_face(it)) {
-        //         obtuse_faces.push_back(it);
-        //     }
-        // }
+        for (it = cdt.finite_faces_begin(); it != cdt.finite_faces_end(); it++) {
+            // Make vector of obtuse faces to calculate points based on those faces later
+            if (graph->is_obtuse_face(it)) {
+                obtuse_faces.push_back(it);
+            }
+        }
 
-        // for (CDT::Face_handle face : obtuse_faces) {
-        //     Point a = it->vertex(0)->point();
-        //     Point b = it->vertex(1)->point();
-        //     Point c = it->vertex(2)->point();
+        // std::cout << "Obtuse faces found: " << obtuse_faces.size() << std::endl;
 
-        //     Point centroid = CGAL::centroid(a, b, c);
+        for (CDT::Face_handle face : obtuse_faces) {
+            Point a = face->vertex(0)->point();
+            Point b = face->vertex(1)->point();
+            Point c = face->vertex(2)->point();
 
-        //     Point point_to_insert = random_point(centroid);
-        //     cdt.insert(point_to_insert);
-        // }
+            Point centroid = CGAL::centroid(a, b, c);
+
+            Point point_to_insert = random_point(centroid);
+            std::cout << "Random point to insert: " << point_to_insert << std::endl;
+
+            cdt.insert(point_to_insert);
+            std::cout << "Point inserted" << std::endl;
+
+        }
     }
 
-
     // End of new part 
-
 
     std::cout << "After processing:" << std::endl;
     std::cout << "Obtuse angles are " << graph->is_obtuse_gen(&cdt) << std::endl;
