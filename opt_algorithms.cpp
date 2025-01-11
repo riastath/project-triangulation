@@ -76,9 +76,6 @@ double local_search(PSLG *graph, CDT_C *cdt, int L) {
         iterations++;
     }
 
-
-    // p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(num_steiner + 1) / num_steiner);
-    // std::cout << "Convergence rate is: " << p_n << std::endl;
     if (convergence_insertions > 0) {
         total_p_n = total_p_n / convergence_insertions;
     } else {

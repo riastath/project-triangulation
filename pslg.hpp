@@ -52,6 +52,7 @@ private:
     std::string method;                             // the algorithm selected
     std::map<std::string, double> parameters;       // for each algorithm
     bool delaunay;                                  // a flag to know if we should start with delaunay or not 
+    bool randomization;                             // a flag to show whether randomization was used or not
 
 public:
     PSLG(std::string filename);         // constructor
@@ -61,14 +62,17 @@ public:
     std::string get_method();
     std::map<std::string, double> get_parameters();
     bool get_delaunay_flag();
+
     
     // Helper functions
     void delaunay_passer(CDT* delaunay_instance);
     void produce_output(CDT instance);
+    double compute_convergence_rate(CDT_C *instance);
     CDT return_cdt(CDT cdt, Point point);
+    void set_randomization_flag(bool value);
 
 
-    // Obtuse checking functions
+    // Obtuse checking functions and convex hull / parallel checking
     double angle(Point a, Point b, Point c);
     bool is_obtuse(Point a, Point b, Point c);
     bool is_obtuse_face(CDT::Face_handle f);
@@ -92,8 +96,4 @@ public:
     // Edge flipping functions
     bool face_is_infinite(CDT::Face_handle face, CDT *instance);
     void flip_edges(CDT *cdt);
-
-    // double compute_convergence_rate(CDT_C *instance, int max_steiner_points);
-    double compute_convergence_rate(CDT_C *instance);
-
 };

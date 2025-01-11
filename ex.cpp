@@ -251,9 +251,11 @@ int main(int argc, char *argv[]) {
 
     // Checking convergence
     if (p < 0.0) {  // small rate -> better convergence
+        graph->set_randomization_flag(false);
         std::cout << "Converged, using p " << std::endl;
     } else {    // big rate -> worse convergence
         std::cout << "Did not converge, using randomization " << std::endl;
+        graph->set_randomization_flag(true);
         CDT::Finite_faces_iterator it;
         std::vector<CDT::Face_handle> obtuse_faces;
 
@@ -264,8 +266,6 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        // std::cout << "Obtuse faces found: " << obtuse_faces.size() << std::endl;
-
         for (CDT::Face_handle face : obtuse_faces) {
             Point a = face->vertex(0)->point();
             Point b = face->vertex(1)->point();
@@ -274,10 +274,10 @@ int main(int argc, char *argv[]) {
             Point centroid = CGAL::centroid(a, b, c);
 
             Point point_to_insert = random_point(centroid);
-            std::cout << "Random point to insert: " << point_to_insert << std::endl;
+            // std::cout << "Random point to insert: " << point_to_insert << std::endl;
 
             cdt.insert(point_to_insert);
-            std::cout << "Point inserted" << std::endl;
+            // std::cout << "Point inserted" << std::endl;
 
         }
     }

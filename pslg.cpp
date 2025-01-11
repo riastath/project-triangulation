@@ -162,29 +162,6 @@ bool PSLG::has_circles() {
     return res;
 }
 
-// // Function to evaluate methods using convergence rate, p
-// double PSLG::compute_convergence_rate(CDT_C *cdt) {
-//     int obtuse_before = is_obtuse_gen(cdt);
-//     double sum_convergence = 0.0;
-
-//     // n is # of steiner points and obtuse(n) is # of obtuse triangles after insertion of n steiner points
-//     for (int n = 1; n < steiner_points.size(); n++) {
-//         cdt->insert(steiner_points.at(n));
-//         int obtuse_after = is_obtuse_gen(cdt);
-//         // no improvement -> skip this iteration
-//         if (obtuse_after == 0 || obtuse_before == 0) {
-//             continue;
-//         }
-        
-//         double p_n = std::log((double)obtuse_after / obtuse_before) / std::log((double)(n + 1) / n);
-//         sum_convergence += p_n;
-//         obtuse_before = obtuse_after;   // for next iteration, we need to recalculate the current # of obtuse
-//     }
-
-//     // This is the average p that is requested
-//     return sum_convergence / (steiner_points.size() - 1);
-// }
-
 
 // Returns the cdt after inserting (steiner) point
 CDT PSLG::return_cdt(CDT cdt, Point point) {
@@ -207,6 +184,12 @@ std::map<std::string, double> PSLG::get_parameters() {
 
 bool PSLG::get_delaunay_flag() {
     return delaunay;
+}
+
+
+void PSLG::set_randomization_flag(bool value) {
+    randomization = value;
+    std::cout << randomization << std::endl;
 }
 
 // To pass all points and edges to the delaunay triangulation instance
@@ -916,13 +899,15 @@ void PSLG::produce_output(CDT instance) {
     // New class members, adding to output
     int obtuse_count = is_obtuse_gen(&instance);
     root.put("obtuse_count", obtuse_count);
-    root.put("method", method);;
+    root.put("method", method);
 
     pt::ptree param_tree;                  // for the parameters
     for (std::pair<const std::string, double> &param : parameters) {
         param_tree.put(param.first, param.second);
     }
     root.add_child("parameters", param_tree);
+
+    root.put("randomization", randomization);
 
     write_json("output.json", root);    // redirect output to a file 
 }
