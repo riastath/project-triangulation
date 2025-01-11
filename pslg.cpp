@@ -30,49 +30,6 @@ PSLG::PSLG(std::string filename) {
     }
 
 
-    // ====== convex hull start ======
-    std::vector<Point_2> hprev;
-
-    for (int &point: bounds) {
-        // std::cout << "point is:" << point_vec[point] << std::endl;
-        hprev.push_back(Point_2(point_vec[point].x(), point_vec[point].y()));
-    }
-
-    std::vector<Point_2> hull;
-    CGAL::convex_hull_2(hprev.begin(), hprev.end(), std::back_inserter(hull));
-    // std::cout << "convex hull points: " << hull.size() << std::endl;
-
-    if (hull.size() != bounds.size()) {
-        std::cout << "PSLG is not convex" << std::endl;
-
-        // ==== parallel start (because we check only if it's not convex)====
-
-        // check for the edges of the non-convex boundary here (parallel) ?
-        if (is_parallel_to_axes(bounds)) {
-            std::cout << "Edges are parallel to the axes (non-convex)" << std::endl;
-        } else {
-            std::cout << "Not all edges are parallel to the axes (non-convex)" << std::endl;
-        }
-        
-        // ==== parallel end ==== 
-
-    }
-    else {
-        bool conv = true;
-        for (int i = 0; i < hull.size(); i++) {
-            if (hull[i] != point_vec[bounds[i]]) {
-                std::cout << hull[i] << " != " << point_vec[bounds[i]] << std::endl;
-                conv = false;
-                break;
-            }
-        }
-        if (conv) {
-            std::cout << "is convex" << std::endl;
-        }
-    }
-    // ====== convex hull end ======
-
-
     // Add constraints
     for (pt::ptree::value_type &add : root.get_child("additional_constraints")) {
         int graph_edge[2];
@@ -86,18 +43,6 @@ PSLG::PSLG(std::string filename) {
         additional_constraints.push_back(constr);
     }
 
-    
-
-    // check for closed constraints
-    bool has = has_circles();
-    if (has) {
-        std::cout << "Input has closed constraints" << std::endl;
-    }
-    else {
-        std::cout << "Input does not have closed constraints" << std::endl;
-    }
-
-
 
     // New parameters added for part 2 : method, delaunay flag, parameters of algorithm
     method = root.get<std::string>("method");
@@ -110,13 +55,41 @@ PSLG::PSLG(std::string filename) {
 
 }
 
+bool PSLG::is_convex() {
+    // create convex hull vector from region boundary points
+    std::vector<Point_2> hprev;
+
+    for (int &point: bounds) {
+        hprev.push_back(Point_2(point_vec[point].x(), point_vec[point].y()));
+    }
+
+    std::vector<Point_2> hull;
+    CGAL::convex_hull_2(hprev.begin(), hprev.end(), std::back_inserter(hull));
+
+    // create convex hull polygon and check if all region boundary points are on the convex hull
+    Polygon_2 conv_hull(hull.begin(), hull.end());
+    for (int i = 0; i < bounds.size(); i++) {
+        if (conv_hull.bounded_side(point_vec[bounds[i]]) != CGAL::ON_BOUNDARY) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool PSLG::has_constraints() {
+    if (additional_constraints.size() == 0) {
+        return false;
+    }
+    return true;
+}
+
 // Function to check if edges are parallel to axes
-bool PSLG::is_parallel_to_axes(const std::vector<int>& edge_points) {
-    for (int i = 0; i < edge_points.size(); i++) {
+bool PSLG::is_parallel_to_axes() {
+    for (int i = 0; i < bounds.size(); i++) {
         // We need to check all the edges
         // Point vec has the graph points, so we use it. Get the first point of the edge, and the next one
-        Point p1 = point_vec[edge_points[i]];
-        Point p2 = point_vec[edge_points[(i + 1) % edge_points.size()]];  // go to the next point to check, practically loop around the edge
+        Point p1 = point_vec[bounds[i]];
+        Point p2 = point_vec[bounds[(i + 1) % bounds.size()]];  // go to the next point to check, practically loop around the edge
         
         // We need to check if this specific edge is horizontal or vertical : horizontal if same y, vertical if same x
         if (!(p1.x() == p2.x() || p1.y() == p2.y())) {

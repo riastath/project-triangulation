@@ -4,6 +4,15 @@
 #include <map>
 #include <random>
 
+enum classification {
+    A, 
+    B,
+    C,
+    D,
+    E
+};
+typedef enum classification In_class;
+
 // int main(int argc, char *argv[]) {
 //     std::string input_filename = "tests/data.json";     // default input
 //     std::string output_filename = "output.json";        // default name for output
@@ -158,6 +167,36 @@ int main(int argc, char *argv[]) {
     fclose(file);
 
     PSLG *graph = new PSLG(input_filename);
+    // classification
+    In_class input_class;
+    if (graph->is_convex()) {
+        if (!graph->has_constraints()) {
+            // convex boundary without constrained edges
+            std::cout << "category A" << std::endl;
+            input_class = A;
+        }
+        else if (!graph->has_circles()) {
+            // convex boundary with "open" constraints
+            std::cout << "category B" << std::endl;
+            input_class = B;
+        }
+        else {
+            // convex boundary with "closed" constraints (circles)
+            std::cout << "category C" << std::endl;
+            input_class = C;
+        }
+    }
+    else if (graph->is_parallel_to_axes()) {
+        // non-convex boundary parallel to axis
+        std::cout << "category D" << std::endl;
+        input_class = D;
+    }
+    else {
+        // non of the above
+        std::cout << "category E" << std::endl;
+        input_class = E;
+    }
+    
     CDT_C cdt;
 
     bool delaunay_flag = graph->get_delaunay_flag();

@@ -29,6 +29,7 @@ typedef CDT::Point Point;
 typedef K::Point_2 Point_2;
 typedef CDT::Edge Edge;
 typedef K::Vector_2 Vector;
+typedef CGAL::Polygon_2<K> Polygon_2;
 
 typedef CGAL::Triangle_2<K> Triangle;
 
@@ -71,8 +72,10 @@ public:
     double angle(Point a, Point b, Point c);
     bool is_obtuse(Point a, Point b, Point c);
     bool is_obtuse_face(CDT::Face_handle f);
+    bool is_convex();
+    bool has_constraints();
     bool has_circles();
-    bool is_parallel_to_axes(const std::vector<int>& boundary_points);
+    bool is_parallel_to_axes();
     int is_obtuse_gen(CDT* instance);
 
     // Steiner point functions
