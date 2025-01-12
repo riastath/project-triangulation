@@ -189,7 +189,6 @@ bool PSLG::get_delaunay_flag() {
 
 void PSLG::set_randomization_flag(bool value) {
     randomization = value;
-    std::cout << randomization << std::endl;
 }
 
 // To pass all points and edges to the delaunay triangulation instance

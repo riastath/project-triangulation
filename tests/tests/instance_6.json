@@ -66,15 +66,9 @@
             10
         ]
     ],
-    "method": "ant",
+    "method": "local",
     "parameters": {
-        "alpha": 2.0,
-        "beta": 5.0,
-        "xi": 1.0,
-        "psi": 3.0,
-        "lambda": 0.5,
-        "kappa": 10,
-        "L": 30
+        "L": 10
     },
     "delaunay": true
 }

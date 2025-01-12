@@ -45,7 +45,11 @@
     ],
     "num_constraints": 0,
     "additional_constraints": [],
-    "method": "local",
-    "parameters": {"L": 11},
+    "method": "sa",
+    "parameters": {
+        "alpha": 2.0,
+        "beta": 5.0,
+        "L": 3000
+    },
     "delaunay": true
 }

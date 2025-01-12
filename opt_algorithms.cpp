@@ -122,6 +122,8 @@ double simulated_annealing(PSLG *graph, CDT_C *cdt, double alpha, double beta, i
 
                 // randomly select a steiner method, and insert steiner point.
                 int choice = rand() % 5;
+                // std::cout << "simulated annealing chose method : " << choice << std::endl;
+
                 switch (choice) {
                     case 0:
                         result = graph->insert_steiner_center_single(*cdt, it, num_obtuse);
@@ -388,6 +390,7 @@ double ant_colony(PSLG *graph, CDT_C *cdt, double alpha, double beta, double x, 
                     std::mt19937 generator(rd());
                     std::discrete_distribution<int> distribution(probabilities.begin(), probabilities.end());
                     int method_choice = distribution(generator);    // the steiner method for the ant
+                    // std::cout << "ant chose method :  " << method_choice << std::endl;
 
                     Point point_choice;                             // the steiner point for the ant
                     // Taking the point directly instead of using "result" variable because we don't need the improvement

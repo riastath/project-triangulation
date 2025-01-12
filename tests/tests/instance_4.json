@@ -54,7 +54,15 @@
             13
         ]
     ],
-    "method": "sa",
-    "parameters": {"alpha": 2.0, "beta": 5.0, "L": 50},
+    "method": "ant",
+   "parameters": {
+        "alpha": 2.0,
+        "beta": 10.0,
+        "xi": 1.0,
+        "psi": 3.0,
+        "lambda": 0.8,
+        "kappa": 20,
+        "L": 2000
+    },
     "delaunay": true
 }

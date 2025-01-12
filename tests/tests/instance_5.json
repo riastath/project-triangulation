@@ -50,7 +50,11 @@
             11
         ]
     ],
-    "method": "local",
-    "parameters": {"L": 6},
+    "method": "sa",
+    "parameters": {
+        "alpha": 2.0,
+        "beta": 5.0,
+        "L": 100
+    },
     "delaunay": true
 }

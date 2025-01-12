@@ -13,6 +13,24 @@ enum classification {
 };
 typedef enum classification In_class;
 
+// Like the method mentioned in e-class for randomization : gaussian distribution, based on the centroid of obtuse triangles
+Point random_point(Point centroid) {
+    // Using gaussian normal distribution for two coordinates
+    double deviation = 0.5; // random choice, can change
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    std::normal_distribution<> x_distribution(CGAL::to_double(centroid.x()), deviation);
+    std::normal_distribution<> y_distribution(CGAL::to_double(centroid.y()), deviation);
+
+    double random_x = x_distribution(gen);
+    double random_y = y_distribution(gen);
+
+    return Point(random_x, random_y);   // the new random point
+}
+
+
 // int main(int argc, char *argv[]) {
 //     std::string input_filename = "tests/data.json";     // default input
 //     std::string output_filename = "output.json";        // default name for output
@@ -41,8 +59,37 @@ typedef enum classification In_class;
 //     fclose(file);
 
 //     PSLG *graph = new PSLG(input_filename);
+//     // classification
+//     In_class input_class;
+//     if (graph->is_convex()) {
+//         if (!graph->has_constraints()) {
+//             // convex boundary without constrained edges
+//             std::cout << "category A" << std::endl;
+//             input_class = A;
+//         }
+//         else if (!graph->has_circles()) {
+//             // convex boundary with "open" constraints
+//             std::cout << "category B" << std::endl;
+//             input_class = B;
+//         }
+//         else {
+//             // convex boundary with "closed" constraints (circles)
+//             std::cout << "category C" << std::endl;
+//             input_class = C;
+//         }
+//     }
+//     else if (graph->is_parallel_to_axes()) {
+//         // non-convex boundary parallel to axis
+//         std::cout << "category D" << std::endl;
+//         input_class = D;
+//     }
+//     else {
+//         // non of the above
+//         std::cout << "category E" << std::endl;
+//         input_class = E;
+//     }
+    
 //     CDT_C cdt;
-//     CDT_C cdt_copy;
 
 //     bool delaunay_flag = graph->get_delaunay_flag();
 //     std::string method = graph->get_method();
@@ -51,7 +98,6 @@ typedef enum classification In_class;
 //     // Only do delaunay if specified in parameters
 //     if (delaunay_flag) {
 //         graph->delaunay_passer(&cdt);
-//         graph->delaunay_passer(&cdt_copy);
 //     } else {
 //         std::cout << "Starting without delaunay." << std::endl;
 //     }
@@ -70,12 +116,12 @@ typedef enum classification In_class;
 //     // Find which method to execute and get parameters from .json file, then execute that method
 //     if (method == "local") {
 //         int max_iterations = params["L"];
-//         local_search(graph, &cdt, max_iterations);
+//         p = local_search(graph, &cdt, max_iterations);
 //     } else if (method == "sa") {
 //         int alpha = params["alpha"];
 //         int beta = params["beta"];
 //         int max_iterations = params["L"];
-//         simulated_annealing(graph, &cdt, alpha, beta, max_iterations);
+//         p = simulated_annealing(graph, &cdt, alpha, beta, max_iterations);
 //     } else if (method == "ant") {
 //         int w1 = params["alpha"];
 //         int w2 = params["beta"];
@@ -84,7 +130,7 @@ typedef enum classification In_class;
 //         int lambda = params["lambda"];
 //         int K = params["kappa"];
 //         int max_iterations = params["L"];
-//         ant_colony(graph, &cdt, w1, w2, x, y, K, max_iterations, lambda);
+//         p = ant_colony(graph, &cdt, w1, w2, x, y, K, max_iterations, lambda);
 //     } else {
 //         std::cerr << "Invalid method! " << std::endl;
 //         return -1;
@@ -93,23 +139,42 @@ typedef enum classification In_class;
 
 //     // New part added
 
-//     p = graph->compute_convergence_rate(&cdt_copy);   // convergence rate
-//     std::cout << "Average convergence rate p̅ is : " << p << std::endl;
+//     std::cout << "Average convergence rate p is : " << p << std::endl;
 
 //     // Checking convergence
-//     if (p < 0.1) {  // small rate -> better convergence
+//     if (p < 0.0) {  // small rate -> better convergence
+//         graph->set_randomization_flag(false);
 //         std::cout << "Converged, using p " << std::endl;
-
-
 //     } else {    // big rate -> worse convergence
 //         std::cout << "Did not converge, using randomization " << std::endl;
+//         graph->set_randomization_flag(true);
+//         CDT::Finite_faces_iterator it;
+//         std::vector<CDT::Face_handle> obtuse_faces;
 
+//         for (it = cdt.finite_faces_begin(); it != cdt.finite_faces_end(); it++) {
+//             // Make vector of obtuse faces to calculate points based on those faces later
+//             if (graph->is_obtuse_face(it)) {
+//                 obtuse_faces.push_back(it);
+//             }
+//         }
 
+//         for (CDT::Face_handle face : obtuse_faces) {
+//             Point a = face->vertex(0)->point();
+//             Point b = face->vertex(1)->point();
+//             Point c = face->vertex(2)->point();
+
+//             Point centroid = CGAL::centroid(a, b, c);
+
+//             Point point_to_insert = random_point(centroid);
+//             // std::cout << "Random point to insert: " << point_to_insert << std::endl;
+
+//             cdt.insert(point_to_insert);
+//             // std::cout << "Point inserted" << std::endl;
+
+//         }
 //     }
 
-
 //     // End of new part 
-
 
 //     std::cout << "After processing:" << std::endl;
 //     std::cout << "Obtuse angles are " << graph->is_obtuse_gen(&cdt) << std::endl;
@@ -120,24 +185,6 @@ typedef enum classification In_class;
 
 //     return 0;
 // }
-
-// Like the method mentioned in e-class for randomization : gaussian distribution, based on the centroid of obtuse triangles
-Point random_point(Point centroid) {
-    // Using gaussian normal distribution for two coordinates
-    double deviation = 0.5; // random choice, can change
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    std::normal_distribution<> x_distribution(CGAL::to_double(centroid.x()), deviation);
-    std::normal_distribution<> y_distribution(CGAL::to_double(centroid.y()), deviation);
-
-    double random_x = x_distribution(gen);
-    double random_y = y_distribution(gen);
-
-    return Point(random_x, random_y);   // the new random point
-}
-
 
 int main(int argc, char *argv[]) {
     std::string input_filename = "tests/data.json";     // default input
@@ -239,6 +286,17 @@ int main(int argc, char *argv[]) {
         int K = params["kappa"];
         int max_iterations = params["L"];
         p = ant_colony(graph, &cdt, w1, w2, x, y, K, max_iterations, lambda);
+    } else if (method == "auto") {
+        double default_alpha = 2.0;
+        double default_beta = 5.0;
+        int default_iterations = 100;
+
+        std::cout << "Chose to run auto with parameters: " 
+            << "alpha = " << default_alpha << ", " 
+            << "beta = " << default_beta << ", "
+            << "for iterations = " << default_iterations 
+            << std::endl;
+
     } else {
         std::cerr << "Invalid method! " << std::endl;
         return -1;
@@ -250,7 +308,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Average convergence rate p is : " << p << std::endl;
 
     // Checking convergence
-    if (p < 0.0) {  // small rate -> better convergence
+    if (p < 0.1) {  // small rate -> better convergence
         graph->set_randomization_flag(false);
         std::cout << "Converged, using p " << std::endl;
     } else {    // big rate -> worse convergence
@@ -286,6 +344,8 @@ int main(int argc, char *argv[]) {
 
     std::cout << "After processing:" << std::endl;
     std::cout << "Obtuse angles are " << graph->is_obtuse_gen(&cdt) << std::endl;
+    std::cout << "Steiner points inserted are " << graph->get_num_steiner_points() << std::endl;
+
 
     CGAL::draw(cdt);
     graph->produce_output(cdt);
