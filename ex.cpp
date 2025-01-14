@@ -98,7 +98,12 @@ int main(int argc, char *argv[]) {
 
     bool delaunay_flag = graph->get_delaunay_flag();
     std::string method = graph->get_method();
-    std::map<std::string, double> params = graph->get_parameters();
+    std::cout << method << std::endl;
+
+    std::map<std::string, double> params;
+    if (method != "auto") {
+        params = graph->get_parameters();
+    }
 
     // Only do delaunay if specified in parameters
     if (delaunay_flag) {
@@ -136,17 +141,38 @@ int main(int argc, char *argv[]) {
         int K = params["kappa"];
         int max_iterations = params["L"];
         p = ant_colony(graph, &cdt, w1, w2, x, y, K, max_iterations, lambda);
+
+    // Run with preselected parameters, found after testing
     } else if (method == "auto") {
-        double default_alpha = 2.0;
-        double default_beta = 5.0;
-        int default_iterations = 100;
+        double p = 0.0;
 
-        std::cout << "Chose to run auto with parameters: " 
-            << "alpha = " << default_alpha << ", " 
-            << "beta = " << default_beta << ", "
-            << "for iterations = " << default_iterations 
-            << std::endl;
-
+        if (input_class == A) {
+            int max_iterations = 100;
+            std::cout << "Running auto category A." <<std::endl;
+            p = local_search(graph, &cdt, max_iterations);
+        } else if (input_class = B) {
+            int alpha = 3;
+            int beta = 7;
+            int max_iterations = 200;
+            std::cout << "Running auto category B." <<std::endl;
+            p = simulated_annealing(graph, &cdt, alpha, beta, max_iterations);
+        } else if (input_class == E) {
+            int alpha = 2;
+            int beta = 5;
+            int max_iterations = 100;
+            std::cout << "Running auto category E." <<std::endl;
+            p = simulated_annealing(graph, &cdt, alpha, beta, max_iterations);
+        }  else {
+            int alpha = 2;
+            int beta = 5;
+            int xi = 1;
+            int psi = 2;
+            double lambda = 0.3;
+            int kappa = 8;
+            int max_iterations = 200;
+            std::cout << "Running auto category : " << input_class << std::endl;
+            p = ant_colony(graph, &cdt, alpha, beta, xi, psi, kappa, max_iterations, lambda);
+        }
     } else {
         std::cerr << "Invalid method! " << std::endl;
         return -1;

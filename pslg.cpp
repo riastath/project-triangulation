@@ -48,9 +48,11 @@ PSLG::PSLG(std::string filename) {
     method = root.get<std::string>("method");
     delaunay = root.get<bool>("delaunay");
 
-    // Parameters will be different for each algorithm
-    for(pt::ptree::value_type &param : root.get_child("parameters")) {
-        parameters[param.first] = param.second.get_value<double>();
+    if (method != "auto") {
+        // Parameters will be different for each algorithm
+        for(pt::ptree::value_type &param : root.get_child("parameters")) {
+            parameters[param.first] = param.second.get_value<double>();
+        }
     }
 
 }
