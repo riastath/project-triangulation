@@ -53,7 +53,6 @@
     ],
     "num_constraints": 0,
     "additional_constraints": [],
-    "method": "local",
-    "parameters": {"L": 50},
+    "method": "auto",
     "delaunay": true
 }

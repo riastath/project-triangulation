@@ -51,5 +51,9 @@
             8,
             10
         ]
-    ]
+    ],
+    "method": "auto",
+    "delaunay": true
+
+
 }

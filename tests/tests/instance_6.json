@@ -66,9 +66,7 @@
             10
         ]
     ],
-    "method": "local",
-    "parameters": {
-        "L": 10
-    },
+    "method": "auto",
     "delaunay": true
+
 }

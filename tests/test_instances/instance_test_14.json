@@ -36,5 +36,7 @@
         2
     ],
     "num_constraints": 0,
-    "additional_constraints": []
+    "additional_constraints": [],
+    "method": "auto",
+    "delaunay": true
 }

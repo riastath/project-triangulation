@@ -47,5 +47,9 @@
             4,
             9
         ]
-    ]
+    ],
+    "method": "auto",
+    "delaunay": true
+
+
 }

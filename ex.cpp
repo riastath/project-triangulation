@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <random>
+#include <chrono>
 
 enum classification {
     A, 
@@ -30,165 +31,14 @@ Point random_point(Point centroid) {
     return Point(random_x, random_y);   // the new random point
 }
 
-
-// int main(int argc, char *argv[]) {
-//     std::string input_filename = "tests/data.json";     // default input
-//     std::string output_filename = "output.json";        // default name for output
-
-//     bool flip = false;
-
-//     for (int i = 1; i < argc; i++) {
-//         std::string arg = argv[i];
-//         if (arg == "-i" && i + 1 < argc) {
-//             input_filename = argv[++i];
-//         } else if (arg == "-o" && i + 1 < argc) {
-//             output_filename = argv[++i];
-//         } else if (arg == "-f") {                       // in case of flipping first
-//             flip = true;
-//         } else {
-//             std::cout << "Invalid argument! " << arg << std::endl;
-//             return -1;
-//         }
-//     }
-
-//     FILE* file = fopen(input_filename.c_str(), "r");
-//     if (file == NULL) {
-//         std::cout << "Input file not found, ending program" << std::endl;
-//         return -1;
-//     }
-//     fclose(file);
-
-//     PSLG *graph = new PSLG(input_filename);
-//     // classification
-//     In_class input_class;
-//     if (graph->is_convex()) {
-//         if (!graph->has_constraints()) {
-//             // convex boundary without constrained edges
-//             std::cout << "category A" << std::endl;
-//             input_class = A;
-//         }
-//         else if (!graph->has_circles()) {
-//             // convex boundary with "open" constraints
-//             std::cout << "category B" << std::endl;
-//             input_class = B;
-//         }
-//         else {
-//             // convex boundary with "closed" constraints (circles)
-//             std::cout << "category C" << std::endl;
-//             input_class = C;
-//         }
-//     }
-//     else if (graph->is_parallel_to_axes()) {
-//         // non-convex boundary parallel to axis
-//         std::cout << "category D" << std::endl;
-//         input_class = D;
-//     }
-//     else {
-//         // non of the above
-//         std::cout << "category E" << std::endl;
-//         input_class = E;
-//     }
-    
-//     CDT_C cdt;
-
-//     bool delaunay_flag = graph->get_delaunay_flag();
-//     std::string method = graph->get_method();
-//     std::map<std::string, double> params = graph->get_parameters();
-
-//     // Only do delaunay if specified in parameters
-//     if (delaunay_flag) {
-//         graph->delaunay_passer(&cdt);
-//     } else {
-//         std::cout << "Starting without delaunay." << std::endl;
-//     }
-
-//     std::cout << "Before processing:" << std::endl;
-//     std::cout << "Obtuse angles are " << graph->is_obtuse_gen(&cdt) << std::endl;
-//     std::cout << std::endl;
-
-//     if (flip) {
-//         graph->flip_edges(&cdt);
-//         std::cout << "Flipped!" << std::endl;
-//     }
-
-//     double p = 0.0; // initial convergence rate
-
-//     // Find which method to execute and get parameters from .json file, then execute that method
-//     if (method == "local") {
-//         int max_iterations = params["L"];
-//         p = local_search(graph, &cdt, max_iterations);
-//     } else if (method == "sa") {
-//         int alpha = params["alpha"];
-//         int beta = params["beta"];
-//         int max_iterations = params["L"];
-//         p = simulated_annealing(graph, &cdt, alpha, beta, max_iterations);
-//     } else if (method == "ant") {
-//         int w1 = params["alpha"];
-//         int w2 = params["beta"];
-//         int x = params["xi"];
-//         int y = params["psi"];
-//         int lambda = params["lambda"];
-//         int K = params["kappa"];
-//         int max_iterations = params["L"];
-//         p = ant_colony(graph, &cdt, w1, w2, x, y, K, max_iterations, lambda);
-//     } else {
-//         std::cerr << "Invalid method! " << std::endl;
-//         return -1;
-//     }
-
-
-//     // New part added
-
-//     std::cout << "Average convergence rate p is : " << p << std::endl;
-
-//     // Checking convergence
-//     if (p < 0.0) {  // small rate -> better convergence
-//         graph->set_randomization_flag(false);
-//         std::cout << "Converged, using p " << std::endl;
-//     } else {    // big rate -> worse convergence
-//         std::cout << "Did not converge, using randomization " << std::endl;
-//         graph->set_randomization_flag(true);
-//         CDT::Finite_faces_iterator it;
-//         std::vector<CDT::Face_handle> obtuse_faces;
-
-//         for (it = cdt.finite_faces_begin(); it != cdt.finite_faces_end(); it++) {
-//             // Make vector of obtuse faces to calculate points based on those faces later
-//             if (graph->is_obtuse_face(it)) {
-//                 obtuse_faces.push_back(it);
-//             }
-//         }
-
-//         for (CDT::Face_handle face : obtuse_faces) {
-//             Point a = face->vertex(0)->point();
-//             Point b = face->vertex(1)->point();
-//             Point c = face->vertex(2)->point();
-
-//             Point centroid = CGAL::centroid(a, b, c);
-
-//             Point point_to_insert = random_point(centroid);
-//             // std::cout << "Random point to insert: " << point_to_insert << std::endl;
-
-//             cdt.insert(point_to_insert);
-//             // std::cout << "Point inserted" << std::endl;
-
-//         }
-//     }
-
-//     // End of new part 
-
-//     std::cout << "After processing:" << std::endl;
-//     std::cout << "Obtuse angles are " << graph->is_obtuse_gen(&cdt) << std::endl;
-
-//     CGAL::draw(cdt);
-//     graph->produce_output(cdt);
-//     std::cout << "Output written! File is : " << output_filename << std::endl;
-
-//     return 0;
-// }
-
 int main(int argc, char *argv[]) {
+
+    auto start_time = std::chrono::high_resolution_clock::now();    // to calculate execution time
+
+
     std::string input_filename = "tests/data.json";     // default input
     std::string output_filename = "output.json";        // default name for output
+
 
     bool flip = false;
 
@@ -332,20 +182,21 @@ int main(int argc, char *argv[]) {
             Point centroid = CGAL::centroid(a, b, c);
 
             Point point_to_insert = random_point(centroid);
-            // std::cout << "Random point to insert: " << point_to_insert << std::endl;
-
             cdt.insert(point_to_insert);
-            // std::cout << "Point inserted" << std::endl;
 
         }
     }
 
     // End of new part 
 
+    // Printing results / statistics
     std::cout << "After processing:" << std::endl;
     std::cout << "Obtuse angles are " << graph->is_obtuse_gen(&cdt) << std::endl;
     std::cout << "Steiner points inserted are " << graph->get_num_steiner_points() << std::endl;
-
+    
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    std::cout << "Execution time was: " << duration.count() << "ms" << std::endl;
 
     CGAL::draw(cdt);
     graph->produce_output(cdt);

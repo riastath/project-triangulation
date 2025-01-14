@@ -45,11 +45,7 @@
     ],
     "num_constraints": 0,
     "additional_constraints": [],
-    "method": "sa",
-    "parameters": {
-        "alpha": 2.0,
-        "beta": 5.0,
-        "L": 3000
-    },
+    "method": "auto",
     "delaunay": true
+
 }
