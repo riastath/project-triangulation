@@ -834,7 +834,7 @@ void print_rational(const K::FT& coord, unsigned long* a, unsigned long* b) {
 } 
 
 // Function that produces the final .json output with the data as requested
-void PSLG::produce_output(CDT instance) {
+void PSLG::produce_output(CDT instance, std::string path) {
     pt::ptree root;
     root.put("content_type", "CG_SHOP_2025_Solution");
     root.put("instance_uid", uid);
@@ -910,5 +910,5 @@ void PSLG::produce_output(CDT instance) {
 
     root.put("randomization", randomization);
 
-    write_json("output.json", root);    // redirect output to a file 
+    write_json(path, root);    // redirect output to a file 
 }

@@ -66,7 +66,7 @@ public:
     
     // Helper functions
     void delaunay_passer(CDT* delaunay_instance);
-    void produce_output(CDT instance);
+    void produce_output(CDT instance, std::string path);
     double compute_convergence_rate(CDT_C *instance);
     CDT return_cdt(CDT cdt, Point point);
     void set_randomization_flag(bool value);

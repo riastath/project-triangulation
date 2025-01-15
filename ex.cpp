@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Execution time was: " << duration.count() << "ms" << std::endl;
 
     CGAL::draw(cdt);
-    graph->produce_output(cdt);
+    graph->produce_output(cdt, output_filename);
     std::cout << "Output written! File is : " << output_filename << std::endl;
 
     return 0;
