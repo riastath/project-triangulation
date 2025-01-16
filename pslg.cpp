@@ -124,7 +124,6 @@ bool rec_circlefinder(std::set<Point> &visited, std::set<Point> &check, std::vec
             used_edge.insert(edge);
 
             if (visited.find(next) == visited.end()) {
-                // std::cout << next << " not in visited set" << std::endl;
                 return rec_circlefinder(visited, check, edges, next, used_edge);
             }
             else if (check.find(next) != check.end()) {
