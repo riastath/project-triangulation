@@ -1,7 +1,13 @@
 #include "opt_algorithms.hpp"
 
 // Optimization algorithm 1 : local search
-double local_search(PSLG *graph, CDT_C *cdt, int L) {
+// # mode 1: only projection 
+// # mode 2: projection centroid 
+// # mode 3: all
+double local_search(PSLG *graph, CDT_C *cdt, int L, int mode) {
+    if (mode < 0 && mode > 3) { // mode protection, default is all
+        mode = 3;   
+    }
     int iterations = 0;
 
     // For convergence rate
@@ -21,31 +27,35 @@ double local_search(PSLG *graph, CDT_C *cdt, int L) {
             max_improvement = -1;
 
             // Check steiner methods and compare improvement value
-            result = graph->insert_steiner_center_single(*cdt, it, num_obtuse);
-            if (max_improvement < result.second) {
-                max_improvement = result.second;
-                max_pair = result;
+            if (mode > 1) {
+                result = graph->insert_steiner_center_single(*cdt, it, num_obtuse);
+                if (max_improvement < result.second) {
+                    max_improvement = result.second;
+                    max_pair = result;
+                }
             }
 
-            result = graph->insert_steiner_mid(*cdt, it, num_obtuse);
-            if (max_improvement < result.second) {
-                max_improvement = result.second;
-                max_pair = result;
+            if (mode > 2) {
+                result = graph->insert_steiner_mid(*cdt, it, num_obtuse);
+                if (max_improvement < result.second) {
+                    max_improvement = result.second;
+                    max_pair = result;
+                }
+
+                result = graph->insert_steiner_bisection(*cdt, it, num_obtuse);
+                if (max_improvement < result.second) {
+                    max_improvement = result.second;
+                    max_pair = result;
+                }
+            
+                result = graph->insert_steiner_circumcenter(*cdt, it, num_obtuse);
+                if (max_improvement < result.second) {
+                    max_improvement = result.second;
+                    max_pair = result;
+                }
             }
 
-            result = graph->insert_steiner_bisection(*cdt, it, num_obtuse);
-            if (max_improvement < result.second) {
-                max_improvement = result.second;
-                max_pair = result;
-            }
-        
             result = graph->insert_steiner_projection(*cdt, it, num_obtuse);
-            if (max_improvement < result.second) {
-                max_improvement = result.second;
-                max_pair = result;
-            }
-
-            result = graph->insert_steiner_circumcenter(*cdt, it, num_obtuse);
             if (max_improvement < result.second) {
                 max_improvement = result.second;
                 max_pair = result;

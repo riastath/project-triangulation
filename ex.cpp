@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     // Find which method to execute and get parameters from .json file, then execute that method
     if (method == "local") {
         int max_iterations = params["L"];
-        p = local_search(graph, &cdt, max_iterations);
+        p = local_search(graph, &cdt, max_iterations, 3);
     } else if (method == "sa") {
         int alpha = params["alpha"];
         int beta = params["beta"];
@@ -149,19 +149,25 @@ int main(int argc, char *argv[]) {
         if (input_class == A) {
             int max_iterations = 100;
             std::cout << "Running auto category A." <<std::endl;
-            p = local_search(graph, &cdt, max_iterations);
+            p = local_search(graph, &cdt, max_iterations, 2); // local search with only projection and centroid
         } else if (input_class = B) {
-            int alpha = 3;
-            int beta = 7;
-            int max_iterations = 200;
+            int max_iterations = 100;
             std::cout << "Running auto category B." <<std::endl;
-            p = simulated_annealing(graph, &cdt, alpha, beta, max_iterations);
-        } else if (input_class == E) {
+            p = local_search(graph, &cdt, max_iterations, 2); // local search with only projection and centroid
+        } else if (input_class == C) {
             int alpha = 2;
             int beta = 5;
             int max_iterations = 100;
-            std::cout << "Running auto category E." <<std::endl;
+            std::cout << "Running auto category C." <<std::endl;
             p = simulated_annealing(graph, &cdt, alpha, beta, max_iterations);
+        } else if (input_class == D) {
+            int max_iterations = 100;
+            std::cout << "Running auto category D." <<std::endl;
+            p = local_search(graph, &cdt, max_iterations, 1); // local search with only projection
+        } else if (input_class == E) {
+            int max_iterations = 100;
+            std::cout << "Running auto category E." <<std::endl;
+            p = local_search(graph, &cdt, max_iterations, 1); // local search with only projection
         }  else {
             int alpha = 2;
             int beta = 5;

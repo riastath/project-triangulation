@@ -7,7 +7,7 @@
 
 // The three optimization algorithms required, to improve the triangulation
 // 1. local search
-double local_search(PSLG *graph, CDT_C *cdt, int L);
+double local_search(PSLG *graph, CDT_C *cdt, int L, int mode);
 
 // 2. simulated annealing
 double energy(PSLG *graph, CDT *cdt, double alpha, double beta);
