@@ -1,3 +1,4 @@
+### (Archived from the notes given to the instructors of the course)
 # PROJECT : Ανάπτυξη Λογισμικού για Αλγοριθμικά Προβλήματα
 
 ## Μέρος 1 της εργασίας
