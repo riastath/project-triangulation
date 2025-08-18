@@ -1,6 +1,9 @@
 ### (Archived from the notes given to the instructors of the course)
 # PROJECT : Ανάπτυξη Λογισμικού για Αλγοριθμικά Προβλήματα
 
+Αυτή η εργασία βασίστηκε στον διαγωνισμό CG:SHOP Challenge για την επίλυση γεωμετρικών προβλημάτων βελτιστοποίησης : 
+https://cgshop.ibr.cs.tu-bs.de/
+
 ## Μέρος 1 της εργασίας
 Μη Αμβλυγώνια Τριγωνοποίηση Επίπεδων Γράφων Ευθύγραμμων Τμημάτων (Planar Straight Line Graphs) με τη χρήση της βιβλιοθήκης CGAL
 
@@ -50,6 +53,7 @@
 3. Οδηγίες μεταγλώττισης.
 Για τη μεταγλώττιση της εργασίας αρκεί να εκτελέσουμε τις παρακάτω εντολές
 - chmod +x build.sh (αν χρειάζεται, για την εκτέλεση του bash script)
+- build.sh
 - make 
 
 4. Οδηγίες χρήσης του προγράμματος.
@@ -64,7 +68,7 @@
 - Γιώργος Πράππας, A.M : 1115202100163
 - Μαρία Σταθοπούλου, Α.Μ : 1115202100177
 
-Το github repository link (private) είναι https://github.com/riastath/project1
+Το github repository link είναι https://github.com/riastath/project-triangulation
 
 
 ## Μέρος 2 της εργασίας 

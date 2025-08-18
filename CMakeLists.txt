@@ -35,8 +35,9 @@ endif()
 # Creating entries for target: project
 # ############################
 
-add_executable(opt_triangulation ex.cpp pslg.cpp opt_algorithms.cpp)
+add_executable(opt_triangulation algorithms/ex.cpp algorithms/pslg.cpp algorithms/opt_algorithms.cpp)
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS project )
+target_include_directories(opt_triangulation PRIVATE algorithms)
 
 # Link the executable to CGAL and third-party libraries
 target_link_libraries(opt_triangulation PRIVATE CGAL::CGAL)
